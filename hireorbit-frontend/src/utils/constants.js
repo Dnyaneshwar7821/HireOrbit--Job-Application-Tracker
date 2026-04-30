@@ -1,0 +1,6 @@
+export const STATUS = {
+  APPLIED: "APPLIED",
+  INTERVIEW: "INTERVIEW",
+  REJECTED: "REJECTED",
+  OFFER: "OFFER",
+};
