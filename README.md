@@ -86,7 +86,7 @@ Recommended production setup:
 
 - Frontend: Vercel
 - Backend: Render
-- Database: Railway MySQL
+- Database: TiDB Cloud Starter
 
 ### Vercel Environment Variables
 
@@ -103,9 +103,12 @@ Then redeploy the Vercel frontend.
 Set these in the Render backend service settings:
 
 ```properties
-SPRING_DATASOURCE_URL=jdbc:mysql://RAILWAY_HOST:RAILWAY_PORT/RAILWAY_DATABASE
-SPRING_DATASOURCE_USERNAME=RAILWAY_USERNAME
-SPRING_DATASOURCE_PASSWORD=RAILWAY_PASSWORD
+SPRING_DATASOURCE_URL=jdbc:mysql://TIDB_HOST:4000/hireorbit?sslMode=VERIFY_IDENTITY&enabledTLSProtocols=TLSv1.2,TLSv1.3&serverTimezone=UTC
+SPRING_DATASOURCE_USERNAME=TIDB_USERNAME
+SPRING_DATASOURCE_PASSWORD=TIDB_PASSWORD
+SPRING_JPA_HIBERNATE_DDL_AUTO=update
+SPRING_JPA_SHOW_SQL=false
+DB_MAX_POOL_SIZE=5
 JWT_SECRET=replace-with-a-long-production-secret
 CORS_ALLOWED_ORIGINS=https://hire-orbit-job-application-tracker.vercel.app
 CORS_ALLOWED_ORIGIN_PATTERNS=https://*.vercel.app
@@ -113,20 +116,19 @@ GEMINI_API_KEY=your-gemini-api-key
 GEMINI_MODEL=gemini-1.5-flash
 ```
 
-Railway usually provides values named like:
+TiDB Cloud provides a MySQL-compatible host, port, username, password, and database name.
+Create a database named `hireorbit`, then use the TiDB connection values in Render.
+
+Example TiDB JDBC URL:
 
 ```properties
-MYSQLHOST
-MYSQLPORT
-MYSQLDATABASE
-MYSQLUSER
-MYSQLPASSWORD
+SPRING_DATASOURCE_URL=jdbc:mysql://gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/hireorbit?sslMode=VERIFY_IDENTITY&enabledTLSProtocols=TLSv1.2,TLSv1.3&serverTimezone=UTC
 ```
 
-Use those values to build the final Render `SPRING_DATASOURCE_URL`, for example:
+If resume analysis history needs manual schema creation, run this file in the TiDB Cloud SQL editor:
 
-```properties
-SPRING_DATASOURCE_URL=jdbc:mysql://containers-us-west-xxx.railway.app:12345/railway
+```text
+hireorbit/src/main/resources/db/resume_analysis_tidb.sql
 ```
 
 For local + production CORS together:
