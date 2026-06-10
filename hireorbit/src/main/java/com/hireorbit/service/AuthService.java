@@ -24,6 +24,10 @@ public class AuthService {
 	private PasswordEncoder passwordEncoder;
 
 	public AuthResponse register(User user) {
+		if (user.getPassword() == null || user.getPassword().isBlank()) {
+			throw new RuntimeException("Password is required");
+		}
+
 		if (userRepository.existsByEmail(user.getEmail())) {
 			throw new RuntimeException("Email already registered");
 		}
