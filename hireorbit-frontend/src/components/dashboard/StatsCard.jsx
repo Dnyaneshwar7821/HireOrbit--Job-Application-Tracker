@@ -4,13 +4,26 @@ const StatsCard = ({ title, value, onClick }) => {
   return (
     <Component
       onClick={onClick}
-      className={`bg-white p-5 rounded-xl shadow hover:shadow-lg transition text-left ${
-        onClick ? "cursor-pointer focus:ring-2 focus:ring-blue-400 outline-none" : ""
+      className={`group rounded-lg border border-slate-200 bg-white p-5 text-left shadow-sm transition ${
+        onClick
+          ? "cursor-pointer hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          : ""
       }`}
       type={onClick ? "button" : undefined}
     >
-      <p className="text-gray-500">{title}</p>
-      <h2 className="text-3xl font-bold text-blue-600">{value}</h2>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium text-slate-500">{title}</p>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+            {value}
+          </h2>
+        </div>
+        {onClick && (
+          <span className="text-slate-300 transition group-hover:text-blue-500">
+            &rarr;
+          </span>
+        )}
+      </div>
     </Component>
   );
 };

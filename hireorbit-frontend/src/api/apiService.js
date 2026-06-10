@@ -4,6 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 45000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -34,6 +35,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.clear();
       window.location.href = "/login";
+    }
+
+    if (error.code === "ECONNABORTED") {
+      error.message = "Request timed out. The backend may be waking up, please try again.";
     }
 
     return Promise.reject(error);

@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../../api/authService";
 import { useApplication } from "../../context/applicationContextValue";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { ui } from "../../styles/ui";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,8 +13,8 @@ const Login = () => {
     email: "",
     password: "",
   });
-
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({
@@ -24,6 +25,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       localStorage.clear();
@@ -34,62 +36,74 @@ const Login = () => {
       const profileRes = await authService.getProfile();
       localStorage.setItem("user", JSON.stringify(profileRes.data));
 
-      await fetchApplications();
-
       navigate("/dashboard");
+      fetchApplications();
     } catch (error) {
-      alert(error.response?.data || "Login failed");
+      alert(error.response?.data || error.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="grid min-h-screen place-items-center px-4 py-10">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-80"
+        className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-xl"
       >
-        <h2 className="text-xl font-bold mb-4 text-center">Login</h2>
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-xl font-bold text-white">
+            H
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-950">
+            Welcome back
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Login to continue tracking your job search.
+          </p>
+        </div>
 
-        {/* Email */}
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          Email
+        </label>
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="you@example.com"
           onChange={handleChange}
-          className="w-full mb-3 p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          className={`${ui.input} mb-4`}
           required
         />
 
-        {/* Password with toggle */}
-        <div className="relative mb-4">
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          Password
+        </label>
+        <div className="relative mb-5">
           <input
             type={showPassword ? "text" : "password"}
             name="password"
-            placeholder="Password"
+            placeholder="Enter your password"
             onChange={handleChange}
-            className="w-full p-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+            className={`${ui.input} pr-10`}
             required
           />
 
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-900"
           >
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full"
-        >
-          Login
+        <button type="submit" disabled={loading} className={`${ui.buttonPrimary} w-full`}>
+          {loading ? "Logging in..." : "Login"}
         </button>
 
-        <p className="text-sm text-center mt-3">
-          Don’t have an account?{" "}
-          <Link to="/register" className="text-blue-600">
+        <p className="mt-5 text-center text-sm text-slate-500">
+          Don't have an account?{" "}
+          <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-700">
             Register
           </Link>
         </p>

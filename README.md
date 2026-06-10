@@ -60,6 +60,7 @@ JWT_SECRET=replace-with-a-long-production-secret
 CORS_ALLOWED_ORIGINS=http://localhost:5173
 CORS_ALLOWED_ORIGIN_PATTERNS=
 GEMINI_API_KEY=optional-gemini-api-key-for-ai-resume-analysis
+GEMINI_TIMEOUT_SECONDS=20
 ```
 
 If `JWT_SECRET` is not set, the app uses a development-only fallback from `application.properties`.
@@ -114,6 +115,7 @@ CORS_ALLOWED_ORIGINS=https://hire-orbit-job-application-tracker.vercel.app
 CORS_ALLOWED_ORIGIN_PATTERNS=https://*.vercel.app
 GEMINI_API_KEY=your-gemini-api-key
 GEMINI_MODEL=gemini-1.5-flash
+GEMINI_TIMEOUT_SECONDS=20
 ```
 
 TiDB Cloud provides a MySQL-compatible host, port, username, password, and database name.

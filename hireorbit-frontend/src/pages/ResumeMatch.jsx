@@ -20,6 +20,10 @@ const ResumeMatch = () => {
   }, []);
 
   const handleCheck = () => {
+    if (loading) {
+      return;
+    }
+
     if (!resume || !job) {
       alert("Enter both fields");
       return;
@@ -34,7 +38,12 @@ const ResumeMatch = () => {
         fetchHistory();
       })
       .catch((error) =>
-        alert(error.response?.data?.message || error.response?.data || "Resume analysis failed"),
+        alert(
+          error.response?.data?.message ||
+            error.response?.data ||
+            error.message ||
+            "Resume analysis failed",
+        ),
       )
       .finally(() => setLoading(false));
   };
@@ -67,7 +76,8 @@ const ResumeMatch = () => {
       <div className="text-center mt-6">
         <button
           onClick={handleCheck}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+          disabled={loading}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition"
         >
           {loading ? "Analyzing..." : "Analyze Resume"}
         </button>
@@ -75,7 +85,7 @@ const ResumeMatch = () => {
 
       {loading && (
         <div className="text-center mt-6 text-gray-500 animate-pulse">
-          Processing your resume...
+          Processing your resume. AI analysis can take a few seconds...
         </div>
       )}
 

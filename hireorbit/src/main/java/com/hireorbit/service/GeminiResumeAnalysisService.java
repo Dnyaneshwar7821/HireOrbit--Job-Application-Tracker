@@ -24,13 +24,16 @@ public class GeminiResumeAnalysisService {
 
 	private final String apiKey;
 	private final String model;
+	private final int timeoutSeconds;
 	private final HttpClient httpClient;
 	private final ObjectMapper objectMapper;
 
 	public GeminiResumeAnalysisService(@Value("${app.gemini.api-key:}") String apiKey,
-			@Value("${app.gemini.model:gemini-1.5-flash}") String model, ObjectMapper objectMapper) {
+			@Value("${app.gemini.model:gemini-1.5-flash}") String model,
+			@Value("${app.gemini.timeout-seconds:20}") int timeoutSeconds, ObjectMapper objectMapper) {
 		this.apiKey = apiKey;
 		this.model = model;
+		this.timeoutSeconds = timeoutSeconds;
 		this.objectMapper = objectMapper;
 		this.httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 	}
@@ -47,9 +50,10 @@ public class GeminiResumeAnalysisService {
 
 			Map<String, Object> requestBody = Map.of("contents",
 					List.of(Map.of("parts", List.of(Map.of("text", buildPrompt(resume, jobDescription))))),
-					"generationConfig", Map.of("temperature", 0.2, "responseMimeType", "application/json"));
+					"generationConfig",
+					Map.of("temperature", 0.2, "maxOutputTokens", 900, "responseMimeType", "application/json"));
 
-			HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).timeout(Duration.ofSeconds(30))
+			HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).timeout(Duration.ofSeconds(timeoutSeconds))
 					.header("Content-Type", "application/json")
 					.POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(requestBody))).build();
 
