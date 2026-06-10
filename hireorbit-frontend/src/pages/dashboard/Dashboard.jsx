@@ -38,13 +38,35 @@ const Dashboard = () => {
     }, {}),
   ).sort((a, b) => a.name.localeCompare(b.name));
 
+  const summaryCards = [
+    {
+      title: "Success Rate",
+      value: `${successRate.toFixed(2)}%`,
+      path: "/applications?status=OFFER",
+    },
+    {
+      title: "Interviews Scheduled",
+      value: interviewsScheduled,
+      path: "/applications?status=INTERVIEW&view=kanban",
+    },
+    {
+      title: "Offers Received",
+      value: offer,
+      path: "/applications?status=OFFER",
+    },
+  ];
+
   return (
     <div className={ui.container}>
       <h1 className={ui.title}>Dashboard</h1>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatsCard title="Total" value={total} onClick={() => navigate("/applications")} />
+        <StatsCard
+          title="Total"
+          value={total}
+          onClick={() => navigate("/applications")}
+        />
         <StatsCard
           title="Applied"
           value={applied}
@@ -75,24 +97,23 @@ const Dashboard = () => {
       {/* EMPTY STATE */}
       {total === 0 ? (
         <div className={ui.emptyState}>
-          No applications yet. Start by adding one 🚀
+          No applications yet. Start by adding one.
         </div>
       ) : (
         <>
           {/* Success Rate */}
           <div className={`${ui.card} mt-6 grid md:grid-cols-3 gap-4`}>
-            <div>
-              <p className="text-gray-500">Success Rate</p>
-              <h2 className={ui.subtitle}>{successRate.toFixed(2)}%</h2>
-            </div>
-            <div>
-              <p className="text-gray-500">Interviews Scheduled</p>
-              <h2 className={ui.subtitle}>{interviewsScheduled}</h2>
-            </div>
-            <div>
-              <p className="text-gray-500">Offers Received</p>
-              <h2 className={ui.subtitle}>{offer}</h2>
-            </div>
+            {summaryCards.map((card) => (
+              <button
+                key={card.title}
+                type="button"
+                onClick={() => navigate(card.path)}
+                className="text-left rounded-lg p-3 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <p className="text-gray-500">{card.title}</p>
+                <h2 className={ui.subtitle}>{card.value}</h2>
+              </button>
+            ))}
           </div>
 
           {/* Chart */}

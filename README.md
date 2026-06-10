@@ -58,6 +58,7 @@ SPRING_DATASOURCE_USERNAME=root
 SPRING_DATASOURCE_PASSWORD=your_password
 JWT_SECRET=replace-with-a-long-production-secret
 CORS_ALLOWED_ORIGINS=http://localhost:5173
+CORS_ALLOWED_ORIGIN_PATTERNS=
 GEMINI_API_KEY=optional-gemini-api-key-for-ai-resume-analysis
 ```
 
@@ -107,6 +108,7 @@ SPRING_DATASOURCE_USERNAME=RAILWAY_USERNAME
 SPRING_DATASOURCE_PASSWORD=RAILWAY_PASSWORD
 JWT_SECRET=replace-with-a-long-production-secret
 CORS_ALLOWED_ORIGINS=https://hire-orbit-job-application-tracker.vercel.app
+CORS_ALLOWED_ORIGIN_PATTERNS=https://*.vercel.app
 GEMINI_API_KEY=your-gemini-api-key
 GEMINI_MODEL=gemini-1.5-flash
 ```
@@ -131,6 +133,12 @@ For local + production CORS together:
 
 ```properties
 CORS_ALLOWED_ORIGINS=http://localhost:5173,https://hire-orbit-job-application-tracker.vercel.app
+```
+
+To allow Vercel preview deployments, set:
+
+```properties
+CORS_ALLOWED_ORIGIN_PATTERNS=https://*.vercel.app
 ```
 
 Render start command:

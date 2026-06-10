@@ -5,6 +5,7 @@ import { useApplication } from "../../context/applicationContextValue";
 import { ui } from "../../styles/ui";
 
 const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"];
+const VIEWS = ["list", "kanban", "timeline"];
 
 const AllApplications = () => {
   const { applications, deleteApplication, updateApplication } = useApplication();
@@ -15,7 +16,9 @@ const AllApplications = () => {
   );
   const [typeFilter, setTypeFilter] = useState("");
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
-  const [view, setView] = useState("list");
+  const [view, setView] = useState(
+    VIEWS.includes(searchParams.get("view")) ? searchParams.get("view") : "list",
+  );
   const navigate = useNavigate();
 
   const handleDelete = (id) => {
@@ -174,7 +177,7 @@ const AllApplications = () => {
       </div>
 
       <div className="flex gap-2 mb-4">
-        {["list", "kanban", "timeline"].map((mode) => (
+        {VIEWS.map((mode) => (
           <button
             key={mode}
             onClick={() => setView(mode)}
