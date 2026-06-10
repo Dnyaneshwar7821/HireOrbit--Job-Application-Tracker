@@ -33,7 +33,9 @@ const ResumeMatch = () => {
         setResult(res.data);
         fetchHistory();
       })
-      .catch(() => alert("Resume analysis failed"))
+      .catch((error) =>
+        alert(error.response?.data?.message || error.response?.data || "Resume analysis failed"),
+      )
       .finally(() => setLoading(false));
   };
 

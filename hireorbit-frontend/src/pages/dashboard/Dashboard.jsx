@@ -4,9 +4,11 @@ import ApplicationChart, {
   MonthlyApplicationChart,
 } from "../../components/dashboard/ApplicationChart";
 import { ui } from "../../styles/ui";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { applications } = useApplication();
+  const navigate = useNavigate();
 
   const total = applications.length;
   const applied = applications.filter((a) => a.status === "APPLIED").length;
@@ -42,12 +44,32 @@ const Dashboard = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatsCard title="Total" value={total} />
-        <StatsCard title="Applied" value={applied} />
-        <StatsCard title="Interview" value={interview} />
-        <StatsCard title="Offers" value={offer} />
-        <StatsCard title="Rejected" value={rejected} />
-        <StatsCard title="Follow-ups" value={followUps} />
+        <StatsCard title="Total" value={total} onClick={() => navigate("/applications")} />
+        <StatsCard
+          title="Applied"
+          value={applied}
+          onClick={() => navigate("/applications?status=APPLIED")}
+        />
+        <StatsCard
+          title="Interview"
+          value={interview}
+          onClick={() => navigate("/applications?status=INTERVIEW")}
+        />
+        <StatsCard
+          title="Offers"
+          value={offer}
+          onClick={() => navigate("/applications?status=OFFER")}
+        />
+        <StatsCard
+          title="Rejected"
+          value={rejected}
+          onClick={() => navigate("/applications?status=REJECTED")}
+        />
+        <StatsCard
+          title="Follow-ups"
+          value={followUps}
+          onClick={() => navigate("/applications?sort=followUp")}
+        />
       </div>
 
       {/* EMPTY STATE */}

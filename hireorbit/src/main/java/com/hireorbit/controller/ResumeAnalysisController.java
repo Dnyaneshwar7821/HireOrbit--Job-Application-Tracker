@@ -11,7 +11,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -151,15 +153,13 @@ public class ResumeAnalysisController {
 
 	@GetMapping("/history")
 	public List<ResumeAnalysis> history(Authentication authentication) {
-		User user = userRepository.findByEmail(authentication.getName())
-				.orElseThrow(() -> new RuntimeException("User not found"));
+		User user = currentUser(authentication);
 
 		return resumeAnalysisRepository.findTop10ByUserIdOrderByCreatedAtDesc(user.getId());
 	}
 
 	private void saveHistory(Authentication authentication, ResumeMatchResponse result) {
-		User user = userRepository.findByEmail(authentication.getName())
-				.orElseThrow(() -> new RuntimeException("User not found"));
+		User user = currentUser(authentication);
 
 		ResumeAnalysis saved = new ResumeAnalysis();
 		saved.setDetectedRole(result.getDetectedRole());
@@ -175,6 +175,15 @@ public class ResumeAnalysisController {
 		saved.setUser(user);
 
 		resumeAnalysisRepository.save(saved);
+	}
+
+	private User currentUser(Authentication authentication) {
+		if (authentication == null || authentication.getName() == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again");
+		}
+
+		return userRepository.findByEmail(authentication.getName())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Please login again"));
 	}
 
 	private String detectRole(String resume, Map<String, Set<String>> roleSkills) {

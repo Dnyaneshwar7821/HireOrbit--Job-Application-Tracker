@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ApplicationCard from "../../components/applications/ApplicationCard";
 import { useApplication } from "../../context/applicationContextValue";
 import { ui } from "../../styles/ui";
@@ -8,10 +8,13 @@ const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"];
 
 const AllApplications = () => {
   const { applications, deleteApplication, updateApplication } = useApplication();
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(
+    searchParams.get("status") || "",
+  );
   const [typeFilter, setTypeFilter] = useState("");
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
   const [view, setView] = useState("list");
   const navigate = useNavigate();
 
