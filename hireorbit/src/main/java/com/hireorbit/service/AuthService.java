@@ -24,6 +24,10 @@ public class AuthService {
 	private PasswordEncoder passwordEncoder;
 
 	public AuthResponse register(User user) {
+		if (userRepository.existsByEmail(user.getEmail())) {
+			throw new RuntimeException("Email already registered");
+		}
+
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		user.setRole("USER");
 

@@ -5,6 +5,10 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
 } from "recharts";
 
 const COLORS = ["#3b82f6", "#facc15", "#22c55e", "#ef4444"];
@@ -37,3 +41,20 @@ const ApplicationChart = ({ data }) => {
 };
 
 export default ApplicationChart;
+
+export const MonthlyApplicationChart = ({ data }) => {
+  return (
+    <div className="bg-white p-6 rounded-xl shadow mt-6">
+      <h2 className="text-xl font-semibold mb-4">Monthly Applications</h2>
+
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data}>
+          <XAxis dataKey="name" />
+          <YAxis allowDecimals={false} />
+          <Tooltip />
+          <Bar dataKey="applications" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};

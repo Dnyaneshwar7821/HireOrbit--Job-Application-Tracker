@@ -1,18 +1,12 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useApplication } from "../../context/ApplicationContext";
+import { useApplication } from "../../context/applicationContextValue";
 
 const ApplicationDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { applications } = useApplication();
 
-  const [application, setApplication] = useState(null);
-
-  useEffect(() => {
-    const app = applications.find((a) => a.id === parseInt(id));
-    if (app) setApplication(app);
-  }, [id, applications]);
+  const application = applications.find((app) => app.id === Number(id));
 
   if (!application) {
     return <p className="p-4 text-gray-500">Loading...</p>;
@@ -34,6 +28,37 @@ const ApplicationDetails = () => {
         </p>
         <p>
           <b>Date:</b> {application.appliedDate}
+        </p>
+        <p>
+          <b>Location:</b> {application.location || "N/A"}
+        </p>
+        <p>
+          <b>Salary:</b> {application.salaryRange || "N/A"}
+        </p>
+        <p>
+          <b>Source:</b> {application.source || "N/A"}
+        </p>
+        <p>
+          <b>Employment Type:</b> {application.employmentType || "N/A"}
+        </p>
+        <p>
+          <b>Follow-up:</b> {application.followUpDate || "Not set"}
+        </p>
+        {application.jobUrl && (
+          <p>
+            <b>Job Link:</b>{" "}
+            <a
+              href={application.jobUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-blue-600 underline"
+            >
+              Open posting
+            </a>
+          </p>
+        )}
+        <p className="mt-3 whitespace-pre-wrap">
+          <b>Notes:</b> {application.notes || "No notes yet"}
         </p>
 
         <button

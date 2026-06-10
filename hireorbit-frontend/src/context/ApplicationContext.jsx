@@ -1,9 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { applicationService } from "../api/applicationService";
-
-const ApplicationContext = createContext();
-
-export const useApplication = () => useContext(ApplicationContext);
+import { ApplicationContext } from "./applicationContextValue";
 
 export const ApplicationProvider = ({ children }) => {
   const [applications, setApplications] = useState([]);
@@ -19,15 +16,31 @@ export const ApplicationProvider = ({ children }) => {
     try {
       const res = await applicationService.getAllJobs();
       setApplications(res.data);
-    } catch (err) {
+    } catch {
       console.error("Error fetching applications");
       setApplications([]);
     }
   };
 
-  // initial load
   useEffect(() => {
-    fetchApplications();
+    const loadApplications = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setApplications([]);
+        return;
+      }
+
+      try {
+        const res = await applicationService.getAllJobs();
+        setApplications(res.data);
+      } catch {
+        console.error("Error fetching applications");
+        setApplications([]);
+      }
+    };
+
+    loadApplications();
   }, []);
 
   // ADD (instant update)

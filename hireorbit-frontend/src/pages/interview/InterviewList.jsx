@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { interviewService } from "../../api/interviewService";
-import { useApplication } from "../../context/ApplicationContext";
+import { useApplication } from "../../context/applicationContextValue";
 
 const InterviewList = () => {
   const { applicationId } = useParams();
@@ -15,16 +15,16 @@ const InterviewList = () => {
 
   const currentApp = applications.find((a) => a.id === parseInt(applicationId));
 
-  const fetchInterviews = () => {
+  const fetchInterviews = useCallback(() => {
     interviewService
       .getInterviews(applicationId)
       .then((res) => setInterviews(res.data))
       .catch(() => alert("Error fetching interviews"));
-  };
+  }, [applicationId]);
 
   useEffect(() => {
     fetchInterviews();
-  }, [applicationId]);
+  }, [fetchInterviews]);
 
   const startEdit = (int) => {
     setEditingId(int.id);

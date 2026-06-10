@@ -35,6 +35,7 @@ public class User {
 	@Column(unique = true, nullable = false)
 	private String email;
 
+	@JsonIgnore
 	private String password;
 
 	private String role; // USER / ADMIN

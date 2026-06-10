@@ -35,21 +35,29 @@ public class JobApplicationService {
 		return jobRepo.findByUserId(userId);
 	}
 
-	public JobApplication updateApplicationById(Long id, JobApplication updatedApp) {
+	public JobApplication updateApplicationById(Long id, JobApplication updatedApp, Long userId) {
 
-		JobApplication existing = jobRepo.findById(id)
+		JobApplication existing = jobRepo.findByIdAndUserId(id, userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
 		existing.setCompanyName(updatedApp.getCompanyName());
 		existing.setJobRole(updatedApp.getJobRole());
 		existing.setStatus(updatedApp.getStatus());
-		existing.setAppliedDate(LocalDate.now()); 
-
+		existing.setJobUrl(updatedApp.getJobUrl());
+		existing.setLocation(updatedApp.getLocation());
+		existing.setSalaryRange(updatedApp.getSalaryRange());
+		existing.setSource(updatedApp.getSource());
+		existing.setEmploymentType(updatedApp.getEmploymentType());
+		existing.setFollowUpDate(updatedApp.getFollowUpDate());
+		existing.setNotes(updatedApp.getNotes());
 		return jobRepo.save(existing);
 	}
 
-	public String deleteApplication(Long id) {
-		jobRepo.deleteById(id);
+	public String deleteApplication(Long id, Long userId) {
+		JobApplication existing = jobRepo.findByIdAndUserId(id, userId)
+				.orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+
+		jobRepo.delete(existing);
 		return "Deleted";
 	}
 

@@ -38,6 +38,21 @@ public class JobApplication {
 
     private LocalDate appliedDate;
 
+    private String jobUrl;
+
+    private String location;
+
+    private String salaryRange;
+
+    private String source;
+
+    private String employmentType;
+
+    private LocalDate followUpDate;
+
+    @javax.persistence.Column(length = 2000)
+    private String notes;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

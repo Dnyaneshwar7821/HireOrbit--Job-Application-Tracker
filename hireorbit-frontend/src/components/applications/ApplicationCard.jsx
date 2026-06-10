@@ -12,6 +12,14 @@ const ApplicationCard = ({ app, onDelete }) => {
       <div>
         <h2 className="font-bold text-lg">{app.companyName || "N/A"}</h2>
         <p className="text-gray-600">{app.jobRole || "N/A"}</p>
+        <p className="text-sm text-gray-500">
+          {[app.location, app.salaryRange, app.employmentType]
+            .filter(Boolean)
+            .join(" | ") || "No extra details"}
+        </p>
+        {app.followUpDate && (
+          <p className="text-sm text-orange-600">Follow up: {app.followUpDate}</p>
+        )}
 
         <span
           className={`text-xs px-2 py-1 rounded ${
@@ -24,6 +32,13 @@ const ApplicationCard = ({ app, onDelete }) => {
 
       {/* RIGHT */}
       <div className="flex gap-2">
+        <button
+          onClick={() => navigate(`/applications/update/${app.id}`)}
+          className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
+        >
+          Edit
+        </button>
+
         <button
           onClick={() => navigate(`/applications/${app.id}`)}
           className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition"

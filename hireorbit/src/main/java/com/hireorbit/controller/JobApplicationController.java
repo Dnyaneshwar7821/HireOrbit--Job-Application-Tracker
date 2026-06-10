@@ -13,7 +13,6 @@ import com.hireorbit.service.JobApplicationService;
 
 @RestController
 @RequestMapping("/applications")
-@CrossOrigin("http://localhost:5173")
 public class JobApplicationController {
 
 	@Autowired
@@ -25,9 +24,7 @@ public class JobApplicationController {
 	@PostMapping("/apply-job")
 	public JobApplication create(@RequestBody JobApplication app, Authentication authentication) {
 
-		String email = authentication.getName();
-
-		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = getAuthenticatedUser(authentication);
 
 		return jobService.createApplication(app, user.getId());
 	}
@@ -35,20 +32,29 @@ public class JobApplicationController {
 	@GetMapping("/get-all-jobs")
 	public List<JobApplication> getAll(Authentication authentication) {
 
-		String email = authentication.getName();
-
-		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = getAuthenticatedUser(authentication);
 
 		return jobService.getAllApplications(user.getId());
 	}
 
 	@PutMapping("/update-job/{id}")
-	public JobApplication updateById(@PathVariable Long id, @RequestBody JobApplication app) {
-		return jobService.updateApplicationById(id, app);
+	public JobApplication updateById(@PathVariable Long id, @RequestBody JobApplication app,
+			Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+
+		return jobService.updateApplicationById(id, app, user.getId());
 	}
 
 	@DeleteMapping("/delete-job/{id}")
-	public String delete(@PathVariable Long id) {
-		return jobService.deleteApplication(id);
+	public String delete(@PathVariable Long id, Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+
+		return jobService.deleteApplication(id, user.getId());
+	}
+
+	private User getAuthenticatedUser(Authentication authentication) {
+		String email = authentication.getName();
+
+		return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 	}
 }

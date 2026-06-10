@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../../api/authService";
-import { useApplication } from "../../context/ApplicationContext";
+import { useApplication } from "../../context/applicationContextValue";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {

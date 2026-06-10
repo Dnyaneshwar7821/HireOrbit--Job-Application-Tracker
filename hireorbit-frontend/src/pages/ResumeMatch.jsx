@@ -1,11 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/apiService";
 
 const ResumeMatch = () => {
   const [resume, setResume] = useState("");
   const [job, setJob] = useState("");
   const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const fetchHistory = () => {
+    api
+      .get("/analysis/history")
+      .then((res) => setHistory(res.data))
+      .catch(() => setHistory([]));
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
   const handleCheck = () => {
     if (!resume || !job) {
@@ -18,20 +30,17 @@ const ResumeMatch = () => {
     api
       .post("/analysis/resume-match", { resume, job })
       .then((res) => {
-        const text = res.data;
-
-        const score = text.match(/Match Score: (\d+)%/)?.[1] || 0;
-        const role = text.match(/Detected Role: (.*)/)?.[1] || "Unknown";
-
-        setResult({ text, score });
+        setResult(res.data);
+        fetchHistory();
       })
+      .catch(() => alert("Resume analysis failed"))
       .finally(() => setLoading(false));
   };
 
   return (
     <div className="max-w-5xl mx-auto p-6">
       <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-6 rounded-xl shadow mb-6 text-center">
-        <h1 className="text-2xl font-bold">📄 Resume Analyzer</h1>
+        <h1 className="text-2xl font-bold">Resume Analyzer</h1>
         <p className="text-sm opacity-80">
           Analyze your resume against job description
         </p>
@@ -62,40 +71,99 @@ const ResumeMatch = () => {
         </button>
       </div>
 
-      {/* LOADING */}
       {loading && (
         <div className="text-center mt-6 text-gray-500 animate-pulse">
           Processing your resume...
         </div>
       )}
 
-      {/* RESULT */}
       {result && (
         <div className="mt-8 bg-white p-6 rounded-xl shadow-lg">
-          {/* SCORE HEADER */}
           <h2 className="text-xl font-semibold mb-4 text-center">
-            Match Score: {result.score}%
+            Match Score: {result.matchScore}%
           </h2>
 
-          {/* PROGRESS BAR */}
           <div className="mb-6">
             <div className="w-full bg-gray-200 h-4 rounded">
               <div
                 className={`h-4 rounded ${
-                  result.score >= 80
+                  result.matchScore >= 80
                     ? "bg-green-500"
-                    : result.score >= 50
+                    : result.matchScore >= 50
                       ? "bg-yellow-500"
                       : "bg-red-500"
                 }`}
-                style={{ width: `${result.score}%` }}
+                style={{ width: `${result.matchScore}%` }}
               />
             </div>
           </div>
 
-          {/* RESULT TEXT */}
-          <div className="bg-gray-100 p-4 rounded text-sm whitespace-pre-wrap">
-            {result.text}
+          <div className="bg-gray-100 p-4 rounded text-sm space-y-3">
+            <p className="text-xs font-semibold text-blue-600">
+              {result.aiPowered ? "AI-powered analysis" : "Rule-based fallback analysis"}
+            </p>
+            <p>
+              <b>Detected Role:</b> {result.detectedRole}
+            </p>
+            <p>
+              <b>Matched Skills:</b>{" "}
+              {result.matchedSkills.length > 0
+                ? result.matchedSkills.join(", ")
+                : "None"}
+            </p>
+            <p>
+              <b>Missing Skills:</b>{" "}
+              {result.missingSkills.length > 0
+                ? result.missingSkills.join(", ")
+                : "None"}
+            </p>
+            <p>
+              <b>Analysis:</b> {result.analysis}
+            </p>
+            {result.suggestions?.length > 0 && (
+              <div>
+                <b>Suggestions:</b>
+                <ul className="list-disc ml-5 mt-1 space-y-1">
+                  {result.suggestions.map((suggestion) => (
+                    <li key={suggestion}>{suggestion}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {result.improvedSummary && (
+              <p>
+                <b>Improved Summary:</b> {result.improvedSummary}
+              </p>
+            )}
+            {result.coverLetter && (
+              <div>
+                <b>Cover Letter Draft:</b>
+                <p className="mt-1 whitespace-pre-wrap">{result.coverLetter}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {history.length > 0 && (
+        <div className="mt-8 bg-white p-6 rounded-xl shadow-lg">
+          <h2 className="text-xl font-semibold mb-4">Recent Analyses</h2>
+          <div className="grid gap-3">
+            {history.map((item) => (
+              <div key={item.id} className="border rounded-lg p-3">
+                <div className="flex justify-between gap-3">
+                  <p className="font-semibold">{item.detectedRole}</p>
+                  <p className="text-blue-600 font-bold">{item.matchScore}%</p>
+                </div>
+                <p className="text-sm text-gray-600">{item.analysis}</p>
+                {item.aiPowered && (
+                  <p className="text-xs text-blue-600 mt-1">AI-powered</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {new Date(item.createdAt).toLocaleString()}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       )}

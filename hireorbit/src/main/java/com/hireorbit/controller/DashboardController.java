@@ -11,7 +11,6 @@ import com.hireorbit.service.DashboardService;
 
 @RestController
 @RequestMapping("/dashboard")
-@CrossOrigin("http://localhost:5173")
 public class DashboardController {
 
 	@Autowired

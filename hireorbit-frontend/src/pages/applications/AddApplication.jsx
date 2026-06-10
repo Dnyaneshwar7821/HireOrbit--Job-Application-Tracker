@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationForm from "../../components/applications/ApplicationForm";
-import { useApplication } from "../../context/ApplicationContext";
+import { useApplication } from "../../context/applicationContextValue";
 
 const AddApplication = () => {
   const navigate = useNavigate();
@@ -11,6 +11,13 @@ const AddApplication = () => {
     companyName: "",
     jobRole: "",
     status: "APPLIED",
+    jobUrl: "",
+    location: "",
+    salaryRange: "",
+    source: "",
+    employmentType: "",
+    followUpDate: "",
+    notes: "",
   });
 
   const handleChange = (e) => {

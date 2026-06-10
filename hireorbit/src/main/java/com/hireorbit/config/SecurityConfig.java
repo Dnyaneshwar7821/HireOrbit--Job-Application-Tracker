@@ -24,8 +24,6 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						// ✅ Public endpoints
 						.requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
-						.requestMatchers(new AntPathRequestMatcher("/ai/**")).permitAll()
-
 						// 🔒 All other endpoints require authentication
 						.anyRequest().authenticated())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

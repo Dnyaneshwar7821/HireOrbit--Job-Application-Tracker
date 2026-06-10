@@ -1,24 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useApplication } from "../../context/ApplicationContext";
+import { useApplication } from "../../context/applicationContextValue";
 import ApplicationForm from "../../components/applications/ApplicationForm";
 
-const UpdateApplication = () => {
-  const { id } = useParams();
+const UpdateApplicationForm = ({ application, updateApplication }) => {
   const navigate = useNavigate();
-
-  const { applications, updateApplication } = useApplication();
-
   const [form, setForm] = useState({
-    companyName: "",
-    jobRole: "",
-    status: "APPLIED",
+    companyName: application.companyName,
+    jobRole: application.jobRole,
+    status: application.status,
+    jobUrl: application.jobUrl || "",
+    location: application.location || "",
+    salaryRange: application.salaryRange || "",
+    source: application.source || "",
+    employmentType: application.employmentType || "",
+    followUpDate: application.followUpDate || "",
+    notes: application.notes || "",
   });
-
-  useEffect(() => {
-    const app = applications.find((a) => a.id === parseInt(id));
-    if (app) setForm(app);
-  }, [id, applications]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,7 +26,7 @@ const UpdateApplication = () => {
     e.preventDefault();
 
     try {
-      await updateApplication(id, form);
+      await updateApplication(application.id, form);
       alert("Updated successfully");
       navigate("/applications");
     } catch {
@@ -42,6 +40,24 @@ const UpdateApplication = () => {
       onChange={handleChange}
       onSubmit={handleSubmit}
       buttonText="Update"
+    />
+  );
+};
+
+const UpdateApplication = () => {
+  const { id } = useParams();
+  const { applications, updateApplication } = useApplication();
+  const application = applications.find((app) => app.id === Number(id));
+
+  if (!application) {
+    return <p className="p-4 text-gray-500">Loading...</p>;
+  }
+
+  return (
+    <UpdateApplicationForm
+      key={application.id}
+      application={application}
+      updateApplication={updateApplication}
     />
   );
 };

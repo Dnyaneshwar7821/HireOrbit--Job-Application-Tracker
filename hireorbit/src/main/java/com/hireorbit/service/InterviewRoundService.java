@@ -22,9 +22,9 @@ public class InterviewRoundService {
 	private JobApplicationRepository jobRepo;
 
 	// 🔥 ADD ROUND
-	public InterviewRound addRound(InterviewRound round, Long applicationId) {
+	public InterviewRound addRound(InterviewRound round, Long applicationId, Long userId) {
 
-		JobApplication application = jobRepo.findById(applicationId)
+		JobApplication application = jobRepo.findByIdAndUserId(applicationId, userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
 		round.setJobApplication(application);
@@ -39,14 +39,17 @@ public class InterviewRoundService {
 	}
 
 	// 🔥 GET ROUNDS
-	public List<InterviewRound> getRounds(Long applicationId) {
+	public List<InterviewRound> getRounds(Long applicationId, Long userId) {
+		jobRepo.findByIdAndUserId(applicationId, userId)
+				.orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+
 		return interviewRepo.findByJobApplicationId(applicationId);
 	}
 
 	// 🔥 UPDATE ROUND
-	public InterviewRound updateRoundById(Long id, InterviewRound updatedRound) {
+	public InterviewRound updateRoundById(Long id, InterviewRound updatedRound, Long userId) {
 
-		InterviewRound existing = interviewRepo.findById(id)
+		InterviewRound existing = interviewRepo.findByIdAndJobApplication_User_Id(id, userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Interview not found"));
 
 		existing.setRoundName(updatedRound.getRoundName());
