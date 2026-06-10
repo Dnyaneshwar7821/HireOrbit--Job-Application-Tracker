@@ -10,6 +10,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -30,6 +33,8 @@ import com.hireorbit.service.GeminiResumeAnalysisService;
 @RestController
 @RequestMapping("/analysis")
 public class ResumeAnalysisController {
+
+	private static final Logger logger = LoggerFactory.getLogger(ResumeAnalysisController.class);
 
 	private final ResumeAnalysisRepository resumeAnalysisRepository;
 	private final UserRepository userRepository;
@@ -155,7 +160,12 @@ public class ResumeAnalysisController {
 	public List<ResumeAnalysis> history(Authentication authentication) {
 		User user = currentUser(authentication);
 
-		return resumeAnalysisRepository.findTop10ByUserIdOrderByCreatedAtDesc(user.getId());
+		try {
+			return resumeAnalysisRepository.findTop10ByUserIdOrderByCreatedAtDesc(user.getId());
+		} catch (DataAccessException ex) {
+			logger.warn("Resume analysis history is unavailable", ex);
+			return List.of();
+		}
 	}
 
 	private void saveHistory(Authentication authentication, ResumeMatchResponse result) {
@@ -174,7 +184,11 @@ public class ResumeAnalysisController {
 		saved.setCreatedAt(LocalDateTime.now());
 		saved.setUser(user);
 
-		resumeAnalysisRepository.save(saved);
+		try {
+			resumeAnalysisRepository.save(saved);
+		} catch (DataAccessException ex) {
+			logger.warn("Resume analysis completed, but history could not be saved", ex);
+		}
 	}
 
 	private User currentUser(Authentication authentication) {

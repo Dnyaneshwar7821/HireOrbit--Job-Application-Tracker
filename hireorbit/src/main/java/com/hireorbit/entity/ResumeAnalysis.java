@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -22,6 +23,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "resume_analysis")
 public class ResumeAnalysis {
 
 	@Id
@@ -38,6 +40,7 @@ public class ResumeAnalysis {
 	@Column(length = 2000)
 	private String missingSkills;
 
+	@Column(length = 4000)
 	private String analysis;
 
 	@Column(length = 4000)
