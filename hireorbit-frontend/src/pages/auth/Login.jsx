@@ -107,6 +107,13 @@ const Login = () => {
             Register
           </Link>
         </p>
+
+        <p className="mt-2 text-center text-xs text-slate-400">
+          Are you an Administrator?{" "}
+          <Link to="/admin/login" className="font-semibold text-slate-700 hover:underline">
+            👑 Admin Portal Login
+          </Link>
+        </p>
       </form>
     </div>
   );

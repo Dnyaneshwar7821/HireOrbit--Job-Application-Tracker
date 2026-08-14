@@ -52,14 +52,21 @@ const Home = () => {
               to="/register"
               className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              Create account
+              Create Account
             </Link>
 
             <Link
               to="/login"
               className="rounded-lg border border-slate-200 bg-white px-5 py-3 font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              Login
+              User Login
+            </Link>
+
+            <Link
+              to="/admin/login"
+              className="rounded-lg bg-slate-900 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+            >
+              👑 Admin Portal
             </Link>
           </div>
         </div>
