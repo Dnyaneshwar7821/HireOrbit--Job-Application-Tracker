@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { adminService } from "../../api/adminService";
 import { useAuth } from "../../context/authContextValue";
-
 import { useToast } from "../../context/ToastContext";
 
 const AdminLogin = () => {
@@ -35,11 +34,6 @@ const AdminLogin = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDemoAdmin = () => {
-    setEmail("admin@hireorbit.com");
-    setPassword("Admin@123");
   };
 
   return (
@@ -101,14 +95,7 @@ const AdminLogin = () => {
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-slate-800 text-center space-y-3">
-          <button
-            onClick={fillDemoAdmin}
-            className="w-full bg-slate-800 hover:bg-slate-700 text-xs text-indigo-300 font-semibold py-2 px-3 rounded-lg border border-slate-700 transition"
-          >
-            ⚡ Auto-Fill Demo Admin Credentials
-          </button>
-
+        <div className="mt-6 pt-6 border-t border-slate-800 text-center">
           <div className="text-xs text-slate-500">
             Looking for job seeker portal?{" "}
             <Link to="/login" className="text-indigo-400 hover:underline">
