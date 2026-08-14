@@ -3,12 +3,20 @@ import { useApplication } from "../../context/applicationContextValue";
 import ApplicationChart, {
   MonthlyApplicationChart,
 } from "../../components/dashboard/ApplicationChart";
-import { ui } from "../../styles/ui";
 import { useNavigate } from "react-router-dom";
+import { FaPlus, FaBrain, FaBriefcase, FaCalendarAlt, FaCheckCircle, FaRocket } from "react-icons/fa";
 
 const Dashboard = () => {
   const { applications } = useApplication();
   const navigate = useNavigate();
+
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || {};
+    } catch {
+      return {};
+    }
+  })();
 
   const total = applications.length;
   const applied = applications.filter((a) => a.status === "APPLIED").length;
@@ -41,27 +49,72 @@ const Dashboard = () => {
   const summaryCards = [
     {
       title: "Success Rate",
-      value: `${successRate.toFixed(2)}%`,
+      value: `${successRate.toFixed(1)}%`,
+      badge: "Conversion",
+      color: "text-emerald-400",
       path: "/applications?status=OFFER",
     },
     {
       title: "Interviews Scheduled",
       value: interviewsScheduled,
+      badge: "In Progress",
+      color: "text-amber-400",
       path: "/applications?status=INTERVIEW&view=kanban",
     },
     {
       title: "Offers Received",
       value: offer,
+      badge: "Secured",
+      color: "text-emerald-400",
       path: "/applications?status=OFFER",
     },
   ];
 
-  return (
-    <div className={ui.container}>
-      <h1 className={ui.title}>Dashboard</h1>
+  const upcomingFollowUpsList = applications
+    .filter((a) => a.followUpDate)
+    .sort((a, b) => a.followUpDate.localeCompare(b.followUpDate))
+    .slice(0, 3);
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+  return (
+    <div className="space-y-8 p-4 sm:p-6 max-w-7xl mx-auto font-sans text-slate-100">
+      {/* Hero Welcome Banner */}
+      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-2xl">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-96 h-96 bg-gradient-to-br from-blue-600/20 via-purple-600/10 to-transparent blur-3xl pointer-events-none rounded-full" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-950/50 px-3.5 py-1 text-xs font-semibold text-blue-400 backdrop-blur-md">
+              <FaRocket className="text-blue-400" />
+              Career Dashboard Active
+            </div>
+            <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+              Welcome back, <span className="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">{user?.name || "Job Seeker"}</span> 👋
+            </h1>
+            <p className="text-sm text-slate-400 max-w-xl">
+              Track your recruitment pipeline, monitor upcoming interviews, and optimize your resume with Gemini AI.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => navigate("/applications/add")}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-5 py-3 text-xs font-bold text-white shadow-lg shadow-blue-600/20 transition transform active:scale-95"
+            >
+              <FaPlus /> Add Application
+            </button>
+
+            <button
+              onClick={() => navigate("/resume-match")}
+              className="flex items-center gap-2 rounded-xl border border-purple-800/80 bg-purple-950/80 hover:bg-purple-900 px-5 py-3 text-xs font-bold text-purple-200 transition shadow-lg shadow-purple-900/20"
+            >
+              <FaBrain className="text-purple-400" /> Run AI Resume Matcher
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <StatsCard
           title="Total"
           value={total}
@@ -96,29 +149,97 @@ const Dashboard = () => {
 
       {/* EMPTY STATE */}
       {total === 0 ? (
-        <div className={ui.emptyState}>
-          No applications yet. Start by adding one.
+        <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/50 p-12 text-center space-y-4">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 text-2xl">
+            <FaBriefcase />
+          </div>
+          <h3 className="text-xl font-bold text-white">No job applications logged yet</h3>
+          <p className="text-sm text-slate-400 max-w-md mx-auto">
+            Start tracking your target companies, interview rounds, and salary details to unlock pipeline analytics.
+          </p>
+          <button
+            onClick={() => navigate("/applications/add")}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-6 py-3 text-xs font-bold text-white shadow-lg shadow-blue-600/20 transition"
+          >
+            <FaPlus /> Add Your First Application
+          </button>
         </div>
       ) : (
         <>
-          {/* Success Rate */}
-          <div className={`${ui.card} mt-6 grid md:grid-cols-3 gap-4`}>
-            {summaryCards.map((card) => (
-              <button
-                key={card.title}
-                type="button"
-                onClick={() => navigate(card.path)}
-                className="text-left rounded-lg p-3 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                <p className="text-gray-500">{card.title}</p>
-                <h2 className={ui.subtitle}>{card.value}</h2>
-              </button>
-            ))}
+          {/* Summary Performance Cards & Follow-ups */}
+          <div className="grid md:grid-cols-12 gap-6">
+            <div className="md:col-span-8 grid sm:grid-cols-3 gap-4">
+              {summaryCards.map((card) => (
+                <button
+                  key={card.title}
+                  type="button"
+                  onClick={() => navigate(card.path)}
+                  className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 text-left transition hover:border-slate-700 hover:bg-slate-900 shadow-xl"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                      {card.title}
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                      {card.badge}
+                    </span>
+                  </div>
+                  <h2 className={`text-3xl font-black ${card.color}`}>
+                    {card.value}
+                  </h2>
+                </button>
+              ))}
+            </div>
+
+            {/* Upcoming Follow-ups widget */}
+            <div className="md:col-span-4 rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-3">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <FaCalendarAlt className="text-blue-400" /> Upcoming Follow-ups
+                </span>
+                <span className="text-[10px] font-bold text-slate-400">
+                  {upcomingFollowUpsList.length} Scheduled
+                </span>
+              </div>
+
+              {upcomingFollowUpsList.length === 0 ? (
+                <p className="text-xs text-slate-500 py-4 text-center">
+                  No upcoming follow-up dates set.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {upcomingFollowUpsList.map((app) => (
+                    <button
+                      key={app.id}
+                      onClick={() => navigate(`/applications/${app.id}`)}
+                      className="w-full flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/70 p-3 hover:border-slate-700 transition text-left"
+                    >
+                      <div>
+                        <p className="text-xs font-bold text-white">{app.companyName}</p>
+                        <p className="text-[11px] text-slate-400">{app.jobRole}</p>
+                      </div>
+                      <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">
+                        {app.followUpDate}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Chart */}
-          <ApplicationChart data={chartData} />
-          <MonthlyApplicationChart data={monthlyData} />
+          {/* Charts Section */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl">
+              <h3 className="text-base font-bold text-white mb-4">Application Distribution</h3>
+              <ApplicationChart data={chartData} />
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl">
+              <h3 className="text-base font-bold text-white mb-4">Monthly Application Activity</h3>
+              <MonthlyApplicationChart data={monthlyData} />
+            </div>
+          </div>
         </>
       )}
     </div>
