@@ -136,66 +136,80 @@ const Home = () => {
             Organize every interview round, score resume ATS readiness using Gemini 1.5 AI, and manage your full recruitment pipeline in one intuitive workspace.
           </p>
 
-          {/* Role Selection Dropdown Card */}
-          <div className="max-w-md rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-2xl backdrop-blur-xl space-y-4">
+          {/* Access Portal Card */}
+          <div className="max-w-lg rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl space-y-5">
             <div className="flex justify-between items-center">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-                Select Your Access Portal
-              </label>
-              <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                Role-Based Access
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                Select Access Portal
+              </span>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20">
+                Spring Security RBAC
               </span>
             </div>
 
-            <div className="relative">
-              <select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3.5 text-sm font-semibold text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition cursor-pointer"
-              >
-                <option value="user">🧑‍💻 Job Seeker Portal (User Dashboard)</option>
-                <option value="admin">👑 Administrator Portal (System Overview)</option>
-              </select>
-              <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
-                ▼
-              </div>
-            </div>
-
-            {/* Dynamic Action Buttons based on Role */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-1">
+            {/* Segmented Tab Switcher */}
+            <div className="grid grid-cols-2 gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
               <button
-                onClick={handlePortalNavigate}
-                className={`flex-1 flex items-center justify-center gap-2 rounded-xl font-bold text-sm px-5 py-3.5 shadow-xl transition transform active:scale-95 ${
-                  selectedRole === "admin"
-                    ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/20"
-                    : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-600/20"
+                type="button"
+                onClick={() => setSelectedRole("user")}
+                className={`flex items-center justify-center gap-2 py-3 px-3 rounded-lg font-bold text-xs transition duration-200 ${
+                  selectedRole === "user"
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30 border border-blue-400/30"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
                 }`}
               >
-                {selectedRole === "admin" ? (
-                  <>
-                    <FaShieldAlt /> Enter Admin Portal <FaArrowRight className="text-xs" />
-                  </>
-                ) : (
-                  <>
-                    <FaUserGraduate /> Continue to User Login <FaArrowRight className="text-xs" />
-                  </>
-                )}
+                <FaUserGraduate className="text-sm" />
+                <span>Job Seeker</span>
               </button>
 
-              {selectedRole === "user" && (
-                <Link
-                  to="/register"
-                  className="rounded-xl border border-slate-700 bg-slate-950 px-5 py-3.5 text-center font-bold text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition"
+              <button
+                type="button"
+                onClick={() => setSelectedRole("admin")}
+                className={`flex items-center justify-center gap-2 py-3 px-3 rounded-lg font-bold text-xs transition duration-200 ${
+                  selectedRole === "admin"
+                    ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-400/30"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+                }`}
+              >
+                <FaShieldAlt className="text-sm" />
+                <span>Admin Portal</span>
+              </button>
+            </div>
+
+            {/* Action Buttons Stack */}
+            <div className="space-y-2.5">
+              {selectedRole === "user" ? (
+                <>
+                  <button
+                    onClick={() => navigate("/login")}
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm py-3.5 px-5 rounded-xl shadow-lg shadow-blue-600/20 transition transform active:scale-98"
+                  >
+                    <span>Sign In as Job Seeker</span>
+                    <FaArrowRight className="text-xs" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/register")}
+                    className="w-full flex items-center justify-center gap-2 bg-slate-950 hover:bg-slate-800 text-slate-200 font-bold text-xs py-3 px-5 rounded-xl border border-slate-800 transition"
+                  >
+                    <span>Create Free Account</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => navigate("/admin/login")}
+                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm py-3.5 px-5 rounded-xl shadow-lg shadow-purple-600/20 transition transform active:scale-98"
                 >
-                  Create Account
-                </Link>
+                  <FaShieldAlt />
+                  <span>Sign In to Admin Control Panel</span>
+                  <FaArrowRight className="text-xs" />
+                </button>
               )}
             </div>
 
-            <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1.5">
-              <FaCheckCircle className="text-emerald-400 text-[11px]" />
+            <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1.5 pt-1">
+              <FaCheckCircle className="text-emerald-400 text-[10px]" />
               {selectedRole === "admin"
-                ? "Authorized admin login (admin@hireorbit.com)"
+                ? "Restricted access (admin@hireorbit.com)"
                 : "Free job application tracking & AI resume scoring"}
             </p>
           </div>
