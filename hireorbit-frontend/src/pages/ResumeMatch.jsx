@@ -8,6 +8,14 @@ const ResumeMatch = () => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [copiedField, setCopiedField] = useState(null);
+
+  const handleCopy = (text, fieldName) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldName);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
   const fetchHistory = () => {
     api
       .get("/analysis/history")
@@ -143,14 +151,31 @@ const ResumeMatch = () => {
               </div>
             )}
             {result.improvedSummary && (
-              <p>
-                <b>Improved Summary:</b> {result.improvedSummary}
-              </p>
+              <div className="border-t pt-3 mt-2">
+                <div className="flex justify-between items-center mb-1">
+                  <b>Improved Summary:</b>
+                  <button
+                    onClick={() => handleCopy(result.improvedSummary, "summary")}
+                    className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-1 rounded hover:bg-blue-200 transition"
+                  >
+                    {copiedField === "summary" ? "✓ Copied!" : "📋 Copy Summary"}
+                  </button>
+                </div>
+                <p className="text-gray-800">{result.improvedSummary}</p>
+              </div>
             )}
             {result.coverLetter && (
-              <div>
-                <b>Cover Letter Draft:</b>
-                <p className="mt-1 whitespace-pre-wrap">{result.coverLetter}</p>
+              <div className="border-t pt-3 mt-2">
+                <div className="flex justify-between items-center mb-1">
+                  <b>Cover Letter Draft:</b>
+                  <button
+                    onClick={() => handleCopy(result.coverLetter, "coverLetter")}
+                    className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-1 rounded hover:bg-blue-200 transition"
+                  >
+                    {copiedField === "coverLetter" ? "✓ Copied!" : "📋 Copy Cover Letter"}
+                  </button>
+                </div>
+                <p className="mt-1 whitespace-pre-wrap text-gray-800">{result.coverLetter}</p>
               </div>
             )}
           </div>

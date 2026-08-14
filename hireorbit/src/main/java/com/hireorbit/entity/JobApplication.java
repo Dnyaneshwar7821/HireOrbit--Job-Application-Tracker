@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -30,8 +31,10 @@ public class JobApplication {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Company name is required")
     private String companyName;
 
+    @NotBlank(message = "Job role is required")
     private String jobRole;
 
     private String status; // APPLIED / INTERVIEW / REJECTED / OFFER

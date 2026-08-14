@@ -2,6 +2,8 @@ package com.hireorbit.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +24,7 @@ public class JobApplicationController {
 	private UserRepository userRepository;
 
 	@PostMapping("/apply-job")
-	public JobApplication create(@RequestBody JobApplication app, Authentication authentication) {
+	public JobApplication create(@Valid @RequestBody JobApplication app, Authentication authentication) {
 
 		User user = getAuthenticatedUser(authentication);
 
@@ -30,15 +32,18 @@ public class JobApplicationController {
 	}
 
 	@GetMapping("/get-all-jobs")
-	public List<JobApplication> getAll(Authentication authentication) {
+	public List<JobApplication> getAll(
+			@RequestParam(required = false) String search,
+			@RequestParam(required = false) String status,
+			Authentication authentication) {
 
 		User user = getAuthenticatedUser(authentication);
 
-		return jobService.getAllApplications(user.getId());
+		return jobService.getAllApplications(user.getId(), search, status);
 	}
 
 	@PutMapping("/update-job/{id}")
-	public JobApplication updateById(@PathVariable Long id, @RequestBody JobApplication app,
+	public JobApplication updateById(@PathVariable Long id, @Valid @RequestBody JobApplication app,
 			Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 

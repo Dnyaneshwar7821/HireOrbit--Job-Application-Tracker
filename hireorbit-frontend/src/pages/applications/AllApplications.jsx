@@ -86,17 +86,63 @@ const AllApplications = () => {
     await updateApplication(app.id, { ...app, status });
   };
 
+  const exportToCSV = () => {
+    if (!filteredApplications.length) {
+      alert("No applications to export");
+      return;
+    }
+    const headers = [
+      "Company Name",
+      "Job Role",
+      "Status",
+      "Applied Date",
+      "Location",
+      "Salary Range",
+      "Employment Type",
+      "Source",
+      "Follow Up Date",
+      "Notes",
+    ];
+    const rows = filteredApplications.map((app) => [
+      `"${(app.companyName || "").replace(/"/g, '""')}"`,
+      `"${(app.jobRole || "").replace(/"/g, '""')}"`,
+      `"${app.status || ""}"`,
+      `"${app.appliedDate || ""}"`,
+      `"${(app.location || "").replace(/"/g, '""')}"`,
+      `"${(app.salaryRange || "").replace(/"/g, '""')}"`,
+      `"${(app.employmentType || "").replace(/"/g, '""')}"`,
+      `"${(app.source || "").replace(/"/g, '""')}"`,
+      `"${app.followUpDate || ""}"`,
+      `"${(app.notes || "").replace(/"/g, '""')}"`,
+    ]);
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "hireorbit_applications.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="p-4">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
         <h1 className="text-2xl font-bold">All Applications</h1>
 
-        <button
-          onClick={() => navigate("/applications/add")}
-          className={ui.buttonPrimary}
-        >
-          + Add Application
-        </button>
+        <div className="flex gap-2">
+          <button onClick={exportToCSV} className={ui.buttonSecondary}>
+            📥 Export CSV
+          </button>
+          <button
+            onClick={() => navigate("/applications/add")}
+            className={ui.buttonPrimary}
+          >
+            + Add Application
+          </button>
+        </div>
       </div>
 
       {upcomingFollowUps.length > 0 && (

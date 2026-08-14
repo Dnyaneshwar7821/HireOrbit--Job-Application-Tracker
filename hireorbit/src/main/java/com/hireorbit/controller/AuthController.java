@@ -2,6 +2,8 @@ package com.hireorbit.controller;
 
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,12 +26,12 @@ public class AuthController {
 	private UserRepository userRepository;
 
 	@PostMapping("/register")
-	public AuthResponse register(@RequestBody User user) {
+	public AuthResponse register(@Valid @RequestBody User user) {
 		return authService.register(user);
 	}
 
 	@PostMapping("/login")
-	public AuthResponse login(@RequestBody LoginRequest request) {
+	public AuthResponse login(@Valid @RequestBody LoginRequest request) {
 		return authService.login(request);
 	}
 

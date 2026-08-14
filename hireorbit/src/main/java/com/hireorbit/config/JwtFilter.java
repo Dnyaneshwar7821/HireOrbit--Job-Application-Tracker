@@ -8,6 +8,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +21,8 @@ import com.hireorbit.util.JwtUtil;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
+	private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
 	@Autowired
 	private JwtUtil jwtUtil;
@@ -49,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
 					}
 				}
 			} catch (Exception e) {
-				System.out.println("JWT error: " + e.getMessage());
+				logger.warn("JWT validation error: {}", e.getMessage());
 			}
 		}
 

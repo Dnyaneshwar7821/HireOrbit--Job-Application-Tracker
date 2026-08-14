@@ -32,7 +32,25 @@ public class JobApplicationService {
 	}
 
 	public List<JobApplication> getAllApplications(Long userId) {
-		return jobRepo.findByUserId(userId);
+		return getAllApplications(userId, null, null);
+	}
+
+	public List<JobApplication> getAllApplications(Long userId, String search, String status) {
+		List<JobApplication> apps = jobRepo.findByUserId(userId);
+
+		return apps.stream().filter(app -> {
+			boolean matchesStatus = (status == null || status.isBlank() || "ALL".equalsIgnoreCase(status)
+					|| (app.getStatus() != null && app.getStatus().equalsIgnoreCase(status)));
+			boolean matchesSearch = true;
+			if (search != null && !search.isBlank()) {
+				String q = search.toLowerCase().trim();
+				matchesSearch = (app.getCompanyName() != null && app.getCompanyName().toLowerCase().contains(q))
+						|| (app.getJobRole() != null && app.getJobRole().toLowerCase().contains(q))
+						|| (app.getLocation() != null && app.getLocation().toLowerCase().contains(q))
+						|| (app.getNotes() != null && app.getNotes().toLowerCase().contains(q));
+			}
+			return matchesStatus && matchesSearch;
+		}).toList();
 	}
 
 	public JobApplication updateApplicationById(Long id, JobApplication updatedApp, Long userId) {
