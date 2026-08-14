@@ -52,8 +52,13 @@ const AdminDashboard = () => {
       await adminService.deleteUser(userId);
       setUsers((prev) => prev.filter((u) => u.id !== userId));
       loadAdminData();
-    } catch {
-      alert("Failed to delete user");
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+          err.response?.data ||
+          err.message ||
+          "Failed to delete user",
+      );
     }
   };
 

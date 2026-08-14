@@ -69,9 +69,13 @@ public class AdminService {
 		return new UserSummaryDTO(saved.getId(), saved.getName(), saved.getEmail(), saved.getRole(), appCount);
 	}
 
+	@org.springframework.transaction.annotation.Transactional
 	public String deleteUser(Long userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		if ("admin@hireorbit.com".equalsIgnoreCase(user.getEmail())) {
+			throw new IllegalArgumentException("Cannot delete primary admin account");
+		}
 		userRepository.delete(user);
 		return "User deleted successfully";
 	}
