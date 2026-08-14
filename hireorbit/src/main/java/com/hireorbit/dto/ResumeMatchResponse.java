@@ -15,10 +15,13 @@ public class ResumeMatchResponse {
 
 	private String detectedRole;
 	private int matchScore;
+	private int atsScore;
 	private List<String> matchedSkills;
 	private List<String> missingSkills;
+	private List<String> partialSkills;
 	private String analysis;
 	private List<String> suggestions;
+	private List<String> atsFeedback;
 	private String improvedSummary;
 	private String coverLetter;
 	private boolean aiPowered;

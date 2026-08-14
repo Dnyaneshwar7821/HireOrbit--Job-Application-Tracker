@@ -34,6 +34,8 @@ public class ResumeAnalysis {
 
 	private int matchScore;
 
+	private int atsScore;
+
 	@Column(length = 2000)
 	private String matchedSkills;
 

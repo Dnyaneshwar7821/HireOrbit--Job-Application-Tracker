@@ -30,6 +30,9 @@ import com.hireorbit.repository.ResumeAnalysisRepository;
 import com.hireorbit.repository.UserRepository;
 import com.hireorbit.service.GeminiResumeAnalysisService;
 
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
 @RestController
 @RequestMapping("/analysis")
 public class ResumeAnalysisController {
@@ -47,16 +50,49 @@ public class ResumeAnalysisController {
 		this.geminiResumeAnalysisService = geminiResumeAnalysisService;
 	}
 
+	@PostMapping("/upload-resume")
+	public ResponseEntity<Map<String, String>> uploadResume(@RequestParam("file") MultipartFile file) {
+		if (file == null || file.isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("message", "File is empty"));
+		}
+
+		String fileName = file.getOriginalFilename() != null ? file.getOriginalFilename().toLowerCase() : "";
+		String text = "";
+
+		try {
+			if (fileName.endsWith(".pdf")) {
+				try (org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.pdmodel.PDDocument.load(file.getInputStream())) {
+					org.apache.pdfbox.text.PDFTextStripper stripper = new org.apache.pdfbox.text.PDFTextStripper();
+					text = stripper.getText(document);
+				}
+			} else if (fileName.endsWith(".docx")) {
+				try (org.apache.poi.xwpf.usermodel.XWPFDocument doc = new org.apache.poi.xwpf.usermodel.XWPFDocument(file.getInputStream());
+						org.apache.poi.xwpf.extractor.XWPFWordExtractor extractor = new org.apache.poi.xwpf.extractor.XWPFWordExtractor(doc)) {
+					text = extractor.getText();
+				}
+			} else {
+				text = new String(file.getBytes(), java.nio.charset.StandardCharsets.UTF_8);
+			}
+
+			return ResponseEntity.ok(Map.of("text", text.trim()));
+		} catch (Exception ex) {
+			logger.error("Failed to extract text from resume file", ex);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("message", "Failed to parse resume document: " + ex.getMessage()));
+		}
+	}
+
 	@PostMapping("/resume-match")
 	public ResponseEntity<ResumeMatchResponse> match(@RequestBody Map<String, String> req,
 			Authentication authentication) {
 
 		String rawResume = req.get("resume");
 		String rawJob = req.get("job");
+		String tone = req.get("tone");
 		String resume = normalize(rawResume);
 		String job = normalize(rawJob);
 
-		ResumeMatchResponse aiResult = geminiResumeAnalysisService.analyze(rawResume, rawJob).orElse(null);
+		ResumeMatchResponse aiResult = geminiResumeAnalysisService.analyze(rawResume, rawJob, tone).orElse(null);
 		if (aiResult != null) {
 			saveHistory(authentication, aiResult);
 			return ResponseEntity.ok(aiResult);
@@ -148,8 +184,46 @@ public class ResumeAnalysisController {
 		String bestRole = detectRole(resume, roleSkills);
 		String feedback = feedbackFor(finalScore);
 
-		ResumeMatchResponse result = new ResumeMatchResponse(bestRole, finalScore, sort(matched), sort(missing),
-				feedback, fallbackSuggestions(missing), "", "", false);
+		// Calculate ATS Score & Feedback
+		List<String> atsChecks = new java.util.ArrayList<>();
+		int atsScore = 100;
+		if (!resume.contains("@")) {
+			atsScore -= 20;
+			atsChecks.add("Missing email address contact info");
+		} else {
+			atsChecks.add("✓ Email address contact info detected");
+		}
+
+		if (!resume.matches(".*\\d{10}.*") && !resume.matches(".*\\d{3}[-\\s]\\d{3}[-\\s]\\d{4}.*")) {
+			atsScore -= 15;
+			atsChecks.add("Consider adding a clear phone number");
+		} else {
+			atsChecks.add("✓ Contact phone number detected");
+		}
+
+		if (!resume.contains("experience") && !resume.contains("employment") && !resume.contains("work")) {
+			atsScore -= 20;
+			atsChecks.add("Add a clear 'Experience' or 'Work History' section heading");
+		} else {
+			atsChecks.add("✓ Experience section header detected");
+		}
+
+		if (!resume.contains("education") && !resume.contains("degree") && !resume.contains("university")) {
+			atsScore -= 15;
+			atsChecks.add("Add an 'Education' section heading");
+		} else {
+			atsChecks.add("✓ Education section header detected");
+		}
+
+		if (resume.length() < 300) {
+			atsScore -= 15;
+			atsChecks.add("Resume length is short (< 300 characters); expand on accomplishments");
+		}
+
+		atsScore = Math.max(20, Math.min(100, atsScore));
+
+		ResumeMatchResponse result = new ResumeMatchResponse(bestRole, finalScore, atsScore, sort(matched), sort(missing),
+				List.of(), feedback, fallbackSuggestions(missing), atsChecks, "", "", false);
 
 		saveHistory(authentication, result);
 
@@ -174,6 +248,7 @@ public class ResumeAnalysisController {
 		ResumeAnalysis saved = new ResumeAnalysis();
 		saved.setDetectedRole(result.getDetectedRole());
 		saved.setMatchScore(result.getMatchScore());
+		saved.setAtsScore(result.getAtsScore());
 		saved.setMatchedSkills(String.join(", ", result.getMatchedSkills()));
 		saved.setMissingSkills(String.join(", ", result.getMissingSkills()));
 		saved.setAnalysis(result.getAnalysis());

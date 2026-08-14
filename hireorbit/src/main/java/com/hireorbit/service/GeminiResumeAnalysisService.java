@@ -39,6 +39,10 @@ public class GeminiResumeAnalysisService {
 	}
 
 	public Optional<ResumeMatchResponse> analyze(String resume, String jobDescription) {
+		return analyze(resume, jobDescription, "Professional");
+	}
+
+	public Optional<ResumeMatchResponse> analyze(String resume, String jobDescription, String tone) {
 		if (apiKey == null || apiKey.isBlank()) {
 			return Optional.empty();
 		}
@@ -49,9 +53,9 @@ public class GeminiResumeAnalysisService {
 					+ URLEncoder.encode(apiKey, StandardCharsets.UTF_8);
 
 			Map<String, Object> requestBody = Map.of("contents",
-					List.of(Map.of("parts", List.of(Map.of("text", buildPrompt(resume, jobDescription))))),
+					List.of(Map.of("parts", List.of(Map.of("text", buildPrompt(resume, jobDescription, tone))))),
 					"generationConfig",
-					Map.of("temperature", 0.2, "maxOutputTokens", 900, "responseMimeType", "application/json"));
+					Map.of("temperature", 0.2, "maxOutputTokens", 1200, "responseMimeType", "application/json"));
 
 			HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).timeout(Duration.ofSeconds(timeoutSeconds))
 					.header("Content-Type", "application/json")
@@ -87,37 +91,45 @@ public class GeminiResumeAnalysisService {
 		ResumeMatchResponse result = new ResumeMatchResponse();
 		result.setDetectedRole(stringValue(data.get("detectedRole"), "Unknown"));
 		result.setMatchScore(intValue(data.get("matchScore")));
+		result.setAtsScore(intValue(data.get("atsScore")));
 		result.setMatchedSkills(stringList(data.get("matchedSkills")));
 		result.setMissingSkills(stringList(data.get("missingSkills")));
+		result.setPartialSkills(stringList(data.get("partialSkills")));
 		result.setAnalysis(stringValue(data.get("analysis"), "AI analysis completed."));
 		result.setSuggestions(stringList(data.get("suggestions")));
+		result.setAtsFeedback(stringList(data.get("atsFeedback")));
 		result.setImprovedSummary(stringValue(data.get("improvedSummary"), ""));
 		result.setCoverLetter(stringValue(data.get("coverLetter"), ""));
 		return result;
 	}
 
-	private String buildPrompt(String resume, String jobDescription) {
+	private String buildPrompt(String resume, String jobDescription, String tone) {
+		String selectedTone = (tone == null || tone.isBlank()) ? "Professional" : tone;
 		return """
 				Analyze this resume against this job description for a job seeker.
+				Generate a cover letter in a %s tone.
 				Return only valid JSON with this exact schema:
 				{
 				  "detectedRole": "string",
-				  "matchScore": 0,
-				  "matchedSkills": ["string"],
-				  "missingSkills": ["string"],
-				  "analysis": "short paragraph",
-				  "suggestions": ["specific resume improvement suggestion"],
-				  "improvedSummary": "rewritten resume summary tailored to the job",
-				  "coverLetter": "short tailored cover letter"
+				  "matchScore": 85,
+				  "atsScore": 90,
+				  "matchedSkills": ["exact skills found in both"],
+				  "missingSkills": ["important skills missing from resume"],
+				  "partialSkills": ["skills that are related or implicitly mentioned"],
+				  "analysis": "detailed alignment evaluation paragraph",
+				  "suggestions": ["specific resume improvement recommendation"],
+				  "atsFeedback": ["ATS formatting and readability diagnostic note"],
+				  "improvedSummary": "rewritten resume summary tailored to the job description",
+				  "coverLetter": "tailored cover letter in %s tone"
 				}
-				Use a matchScore from 0 to 100. Keep suggestions practical and concise.
+				Keep matchScore and atsScore from 0 to 100.
 
 				Resume:
 				%s
 
 				Job Description:
 				%s
-				""".formatted(resume, jobDescription);
+				""".formatted(selectedTone, selectedTone, resume, jobDescription);
 	}
 
 	private String stringValue(Object value, String fallback) {
