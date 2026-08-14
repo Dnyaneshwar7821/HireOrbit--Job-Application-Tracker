@@ -52,7 +52,7 @@ const UpdateApplication = () => {
   const application = applications.find((app) => app.id === Number(id));
 
   if (!application) {
-    return <p className="p-4 text-gray-500">Loading...</p>;
+    return <p className="p-4 text-slate-400">Application not found</p>;
   }
 
   return (

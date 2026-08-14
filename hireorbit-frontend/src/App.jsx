@@ -32,13 +32,7 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 
 function App() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center text-gray-500">
-          Loading...
-        </div>
-      }
-    >
+    <Suspense fallback={null}>
       <Routes>
         {/* Home */}
         <Route path="/" element={<Home />} />

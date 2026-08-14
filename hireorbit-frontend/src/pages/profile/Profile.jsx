@@ -4,8 +4,13 @@ import { authService } from "../../api/authService";
 import { useToast } from "../../context/ToastContext";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || null;
+    } catch {
+      return null;
+    }
+  });
 
   const [showDelete, setShowDelete] = useState(false);
   const [password, setPassword] = useState("");
@@ -17,9 +22,8 @@ const Profile = () => {
     authService
       .getProfile()
       .then((res) => setUser(res.data))
-      .catch(() => showError("Profile fetch failed"))
-      .finally(() => setLoading(false));
-  }, [showError]);
+      .catch(() => {});
+  }, []);
 
   const handleDelete = async () => {
     if (!password) {
@@ -36,14 +40,6 @@ const Profile = () => {
       showError(err.response?.data?.message || err.response?.data || "Delete failed");
     }
   };
-
-  if (loading) {
-    return (
-      <div className="text-center py-6 text-gray-500 animate-pulse">
-        Loading profile...
-      </div>
-    );
-  }
 
   return (
     <div className="p-6 max-w-3xl mx-auto">

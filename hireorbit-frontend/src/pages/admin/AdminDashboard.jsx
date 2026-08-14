@@ -3,12 +3,18 @@ import { adminService } from "../../api/adminService";
 import { FaTrash, FaExclamationTriangle, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalApplications: 0,
+    totalOffers: 0,
+    totalResumeAnalyses: 0,
+    successRate: 0,
+    statusBreakdown: { APPLIED: 0, INTERVIEW: 0, OFFER: 0, REJECTED: 0 },
+  });
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // Custom Modal & Toast States (No system popups)
+  // Custom Modal & Toast States
   const [userToDelete, setUserToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState(null);
@@ -18,10 +24,7 @@ const AdminDashboard = () => {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const loadAdminData = async (isInitial = false) => {
-    if (isInitial) {
-      setLoading(true);
-    }
+  const loadAdminData = async () => {
     try {
       const [statsRes, usersRes] = await Promise.all([
         adminService.getStats(),
@@ -30,16 +33,12 @@ const AdminDashboard = () => {
       setStats(statsRes.data);
       setUsers(usersRes.data);
     } catch {
-      showToast("Failed to load admin metrics", "error");
-    } finally {
-      if (isInitial) {
-        setLoading(false);
-      }
+      // Keep quiet or show subtle toast on error
     }
   };
 
   useEffect(() => {
-    loadAdminData(true);
+    loadAdminData();
   }, []);
 
   const confirmDeleteUser = async () => {
@@ -51,7 +50,7 @@ const AdminDashboard = () => {
       setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
       setUserToDelete(null);
       showToast(`User ${userToDelete.email} deleted successfully.`, "success");
-      loadAdminData(false);
+      loadAdminData();
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -71,16 +70,8 @@ const AdminDashboard = () => {
       u.email?.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-slate-400">
-        Loading Admin Analytics & User Metrics...
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-8 relative">
+    <div className="space-y-8 relative font-sans">
       {/* Toast Notification Popup */}
       {toast && (
         <div
@@ -148,86 +139,82 @@ const AdminDashboard = () => {
       </div>
 
       {/* KPI Cards */}
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-            <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
-              Total Job Seekers
-            </p>
-            <p className="text-3xl font-extrabold text-white mt-2">
-              {stats.totalUsers}
-            </p>
-            <p className="text-xs text-indigo-400 mt-1">Registered Accounts</p>
-          </div>
-
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-            <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
-              Applications Tracked
-            </p>
-            <p className="text-3xl font-extrabold text-white mt-2">
-              {stats.totalApplications}
-            </p>
-            <p className="text-xs text-blue-400 mt-1">Across all users</p>
-          </div>
-
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-            <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
-              Offers Extended
-            </p>
-            <p className="text-3xl font-extrabold text-emerald-400 mt-2">
-              {stats.totalOffers}
-            </p>
-            <p className="text-xs text-emerald-400/70 mt-1">
-              Success Rate: {stats.successRate.toFixed(1)}%
-            </p>
-          </div>
-
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-            <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
-              AI Resume Analyses
-            </p>
-            <p className="text-3xl font-extrabold text-purple-400 mt-2">
-              {stats.totalResumeAnalyses}
-            </p>
-            <p className="text-xs text-purple-400/70 mt-1">Gemini AI Runs</p>
-          </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+          <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
+            Total Job Seekers
+          </p>
+          <p className="text-3xl font-extrabold text-white mt-2">
+            {stats.totalUsers}
+          </p>
+          <p className="text-xs text-indigo-400 mt-1">Registered Accounts</p>
         </div>
-      )}
+
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+          <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
+            Applications Tracked
+          </p>
+          <p className="text-3xl font-extrabold text-white mt-2">
+            {stats.totalApplications}
+          </p>
+          <p className="text-xs text-blue-400 mt-1">Across all users</p>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+          <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
+            Offers Extended
+          </p>
+          <p className="text-3xl font-extrabold text-emerald-400 mt-2">
+            {stats.totalOffers}
+          </p>
+          <p className="text-xs text-emerald-400/70 mt-1">
+            Success Rate: {(stats.successRate || 0).toFixed(1)}%
+          </p>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+          <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
+            AI Resume Analyses
+          </p>
+          <p className="text-3xl font-extrabold text-purple-400 mt-2">
+            {stats.totalResumeAnalyses}
+          </p>
+          <p className="text-xs text-purple-400/70 mt-1">Gemini AI Runs</p>
+        </div>
+      </div>
 
       {/* Application Breakdown */}
-      {stats?.statusBreakdown && (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-lg">
-          <h2 className="text-lg font-bold text-white mb-4">
-            Platform Application Status Breakdown
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
-              <p className="text-xs text-slate-400">APPLIED</p>
-              <p className="text-xl font-bold text-blue-400">
-                {stats.statusBreakdown.APPLIED || 0}
-              </p>
-            </div>
-            <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
-              <p className="text-xs text-slate-400">INTERVIEW</p>
-              <p className="text-xl font-bold text-amber-400">
-                {stats.statusBreakdown.INTERVIEW || 0}
-              </p>
-            </div>
-            <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
-              <p className="text-xs text-slate-400">OFFER</p>
-              <p className="text-xl font-bold text-emerald-400">
-                {stats.statusBreakdown.OFFER || 0}
-              </p>
-            </div>
-            <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
-              <p className="text-xs text-slate-400">REJECTED</p>
-              <p className="text-xl font-bold text-red-400">
-                {stats.statusBreakdown.REJECTED || 0}
-              </p>
-            </div>
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-lg">
+        <h2 className="text-lg font-bold text-white mb-4">
+          Platform Application Status Breakdown
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
+            <p className="text-xs text-slate-400">APPLIED</p>
+            <p className="text-xl font-bold text-blue-400">
+              {stats.statusBreakdown?.APPLIED || 0}
+            </p>
+          </div>
+          <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
+            <p className="text-xs text-slate-400">INTERVIEW</p>
+            <p className="text-xl font-bold text-amber-400">
+              {stats.statusBreakdown?.INTERVIEW || 0}
+            </p>
+          </div>
+          <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
+            <p className="text-xs text-slate-400">OFFER</p>
+            <p className="text-xl font-bold text-emerald-400">
+              {stats.statusBreakdown?.OFFER || 0}
+            </p>
+          </div>
+          <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/50">
+            <p className="text-xs text-slate-400">REJECTED</p>
+            <p className="text-xl font-bold text-red-400">
+              {stats.statusBreakdown?.REJECTED || 0}
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
       {/* User Management Section */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-lg space-y-4">
