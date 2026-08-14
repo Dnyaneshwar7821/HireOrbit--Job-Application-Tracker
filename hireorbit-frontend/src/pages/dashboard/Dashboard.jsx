@@ -4,7 +4,7 @@ import ApplicationChart, {
   MonthlyApplicationChart,
 } from "../../components/dashboard/ApplicationChart";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaBrain, FaBriefcase, FaCalendarAlt, FaCheckCircle, FaRocket } from "react-icons/fa";
+import { FaPlus, FaBrain, FaBriefcase, FaCalendarAlt, FaRocket } from "react-icons/fa";
 
 const Dashboard = () => {
   const { applications } = useApplication();
@@ -76,21 +76,21 @@ const Dashboard = () => {
     .slice(0, 3);
 
   return (
-    <div className="space-y-8 p-4 sm:p-6 max-w-7xl mx-auto font-sans text-slate-100">
+    <div className="space-y-8 p-4 sm:p-6 max-w-7xl mx-auto font-sans text-slate-100 min-h-[85vh]">
       {/* Hero Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-slate-800/90 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-96 h-96 bg-gradient-to-br from-blue-600/20 via-purple-600/10 to-transparent blur-3xl pointer-events-none rounded-full" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-950/50 px-3.5 py-1 text-xs font-semibold text-blue-400 backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-950/60 px-3.5 py-1 text-xs font-semibold text-blue-400 backdrop-blur-md">
               <FaRocket className="text-blue-400" />
-              Career Dashboard Active
+              Career Command Center Active
             </div>
             <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Welcome back, <span className="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">{user?.name || "Job Seeker"}</span> 👋
+              Welcome back, <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">{user?.name || "Job Seeker"}</span> 👋
             </h1>
-            <p className="text-sm text-slate-400 max-w-xl">
+            <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
               Track your recruitment pipeline, monitor upcoming interviews, and optimize your resume with Gemini AI.
             </p>
           </div>
@@ -98,14 +98,14 @@ const Dashboard = () => {
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => navigate("/applications/add")}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-5 py-3 text-xs font-bold text-white shadow-lg shadow-blue-600/20 transition transform active:scale-95"
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-5 py-3 text-xs font-extrabold text-white shadow-xl shadow-blue-600/25 transition transform active:scale-95"
             >
               <FaPlus /> Add Application
             </button>
 
             <button
               onClick={() => navigate("/resume-match")}
-              className="flex items-center gap-2 rounded-xl border border-purple-800/80 bg-purple-950/80 hover:bg-purple-900 px-5 py-3 text-xs font-bold text-purple-200 transition shadow-lg shadow-purple-900/20"
+              className="flex items-center gap-2 rounded-xl border border-purple-800/80 bg-purple-950/80 hover:bg-purple-900 px-5 py-3 text-xs font-extrabold text-purple-200 transition shadow-xl shadow-purple-900/20"
             >
               <FaBrain className="text-purple-400" /> Run AI Resume Matcher
             </button>
@@ -149,20 +149,25 @@ const Dashboard = () => {
 
       {/* EMPTY STATE */}
       {total === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/50 p-12 text-center space-y-4">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 text-2xl">
-            <FaBriefcase />
+        <div className="relative rounded-3xl border border-slate-800/90 bg-gradient-to-b from-slate-900/90 to-slate-950/90 p-12 text-center shadow-2xl space-y-5 overflow-hidden backdrop-blur-xl">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/10 blur-3xl pointer-events-none rounded-full" />
+          <div className="relative z-10 space-y-4">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600/20 to-indigo-600/20 border border-blue-500/30 text-blue-400 text-3xl shadow-lg shadow-blue-500/10">
+              <FaBriefcase />
+            </div>
+            <h3 className="text-2xl font-extrabold text-white">No Job Applications Tracked Yet</h3>
+            <p className="text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+              Start building your recruitment pipeline by adding your target companies, salary expectations, and interview rounds.
+            </p>
+            <div className="pt-2">
+              <button
+                onClick={() => navigate("/applications/add")}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-6 py-3.5 text-xs font-extrabold text-white shadow-xl shadow-blue-600/30 transition transform active:scale-95"
+              >
+                <FaPlus /> Add Your First Application
+              </button>
+            </div>
           </div>
-          <h3 className="text-xl font-bold text-white">No job applications logged yet</h3>
-          <p className="text-sm text-slate-400 max-w-md mx-auto">
-            Start tracking your target companies, interview rounds, and salary details to unlock pipeline analytics.
-          </p>
-          <button
-            onClick={() => navigate("/applications/add")}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-6 py-3 text-xs font-bold text-white shadow-lg shadow-blue-600/20 transition"
-          >
-            <FaPlus /> Add Your First Application
-          </button>
         </div>
       ) : (
         <>
