@@ -25,15 +25,9 @@ const AdminLayout = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Link
-              to="/dashboard"
-              className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
-            >
-              💼 Switch to User View
-            </Link>
             <button
               onClick={handleAdminLogout}
-              className="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg border border-red-500/30 transition"
+              className="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3.5 py-1.5 rounded-lg border border-red-500/30 transition font-semibold"
             >
               Sign Out
             </button>
