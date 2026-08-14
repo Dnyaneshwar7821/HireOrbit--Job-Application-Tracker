@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import api from "../api/apiService";
+import { useTheme } from "../context/ThemeContext";
 
 const ResumeMatch = () => {
   const [resume, setResume] = useState("");
@@ -11,6 +12,9 @@ const ResumeMatch = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState("");
   const [copiedField, setCopiedField] = useState(null);
+
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const reportRef = useRef(null);
 
@@ -124,16 +128,16 @@ const ResumeMatch = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 relative">
+    <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 relative font-sans">
       {errorMessage && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-semibold shadow-md flex items-center justify-between animate-bounce">
+        <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm font-semibold shadow-md flex items-center justify-between animate-bounce">
           <span>⚠️ {errorMessage}</span>
-          <button onClick={() => setErrorMessage("")} className="text-xs font-bold text-red-500 hover:text-red-700">✕</button>
+          <button onClick={() => setErrorMessage("")} className="text-xs font-bold text-red-400 hover:text-red-200">✕</button>
         </div>
       )}
 
       {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-6 rounded-2xl shadow-xl text-center">
+      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-6 sm:p-8 rounded-3xl shadow-2xl text-center">
         <h1 className="text-3xl font-extrabold tracking-tight">
           AI Resume & ATS Analyzer
         </h1>
@@ -143,14 +147,18 @@ const ResumeMatch = () => {
       </div>
 
       {/* Input Grid */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-6">
         {/* Resume Input + Drag & Drop Upload */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className="text-sm font-bold text-slate-700">
+            <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-700"}`}>
               1. Resume Content
             </label>
-            <label className="cursor-pointer text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 px-3 py-1 rounded-lg font-semibold transition">
+            <label className={`cursor-pointer text-xs px-3 py-1 rounded-lg font-bold transition border ${
+              isDark
+                ? "bg-indigo-950/80 text-indigo-300 border-indigo-800 hover:bg-indigo-900"
+                : "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100"
+            }`}>
               {uploading ? "Extracting..." : "📄 Upload PDF / Word"}
               <input
                 type="file"
@@ -163,7 +171,7 @@ const ResumeMatch = () => {
           </div>
 
           {uploadedFileName && (
-            <p className="text-xs text-emerald-600 font-medium">
+            <p className="text-xs text-emerald-400 font-semibold">
               ✓ Loaded text from <span className="font-bold">{uploadedFileName}</span>
             </p>
           )}
@@ -172,28 +180,36 @@ const ResumeMatch = () => {
             placeholder="Paste your Resume text here or click Upload PDF/Word..."
             value={resume}
             onChange={(e) => setResume(e.target.value)}
-            className="w-full p-4 border rounded-xl h-56 focus:ring-2 focus:ring-blue-500 outline-none text-sm text-slate-800"
+            className={`w-full p-4 border rounded-2xl h-56 outline-none text-sm transition focus:ring-2 focus:ring-blue-500 ${
+              isDark
+                ? "bg-slate-900 border-slate-800 text-white placeholder-slate-500"
+                : "bg-white border-slate-300 text-slate-900 placeholder-slate-400"
+            }`}
           />
         </div>
 
         {/* Job Description Input + Tone Selector */}
         <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="text-sm font-bold text-slate-700">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-700"}`}>
               2. Job Description
             </label>
-            <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
-              <span className="text-xs text-slate-500 px-1 font-medium">
-                Cover Letter Tone:
+            <div className={`flex items-center space-x-1 p-1 rounded-xl border ${
+              isDark ? "bg-slate-900 border-slate-800" : "bg-slate-100 border-slate-200"
+            }`}>
+              <span className={`text-[11px] font-bold px-1.5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                Tone:
               </span>
               {["Professional", "Startup", "Technical"].map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => setTone(t)}
-                  className={`text-xs px-2 py-0.5 rounded font-semibold transition ${
+                  className={`text-[11px] px-2.5 py-1 rounded-lg font-bold transition ${
                     tone === t
-                      ? "bg-white text-blue-700 shadow-sm"
+                      ? "bg-blue-600 text-white shadow-md"
+                      : isDark
+                      ? "text-slate-400 hover:text-slate-200"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -207,7 +223,11 @@ const ResumeMatch = () => {
             placeholder="Paste the target Job Description here..."
             value={job}
             onChange={(e) => setJob(e.target.value)}
-            className="w-full p-4 border rounded-xl h-56 focus:ring-2 focus:ring-blue-500 outline-none text-sm text-slate-800"
+            className={`w-full p-4 border rounded-2xl h-56 outline-none text-sm transition focus:ring-2 focus:ring-blue-500 ${
+              isDark
+                ? "bg-slate-900 border-slate-800 text-white placeholder-slate-500"
+                : "bg-white border-slate-300 text-slate-900 placeholder-slate-400"
+            }`}
           />
         </div>
       </div>
@@ -217,106 +237,81 @@ const ResumeMatch = () => {
         <button
           onClick={handleCheck}
           disabled={loading}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold px-8 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg disabled:opacity-50 transition"
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs uppercase tracking-wider px-8 py-3.5 rounded-xl hover:from-blue-500 hover:to-indigo-500 shadow-xl shadow-blue-600/20 disabled:opacity-50 transition transform active:scale-95 cursor-pointer"
         >
           {loading ? "Analyzing Alignment & ATS Compatibility..." : "🚀 Analyze Resume Alignment"}
         </button>
       </div>
 
-      {loading && (
-        <div className="text-center text-slate-500 animate-pulse text-sm">
-          Processing document text. Computing ATS diagnostics and generating recommendations...
-        </div>
-      )}
-
       {/* Analysis Results */}
       {result && (
         <div className="space-y-6">
           {/* Header Action Bar */}
-          <div className="flex justify-between items-center bg-slate-900 text-white p-4 rounded-xl">
-            <span className="text-xs font-semibold text-blue-400">
+          <div className={`flex justify-between items-center p-4 rounded-2xl border ${
+            isDark ? "bg-slate-900 border-slate-800 text-white" : "bg-slate-100 border-slate-200 text-slate-900"
+          }`}>
+            <span className="text-xs font-bold text-blue-400">
               {result.aiPowered ? "✨ Gemini 1.5 Flash AI Engine" : "⚡ Heuristic Rule Analysis"}
             </span>
             <button
               onClick={handleDownloadPdf}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md"
             >
               📥 Download PDF Report
             </button>
           </div>
 
-          {/* PDF Report Container */}
-          <div ref={reportRef} className="bg-white p-6 md:p-8 rounded-2xl shadow-xl space-y-6 border border-slate-200">
+          {/* Report Container */}
+          <div
+            ref={reportRef}
+            className={`p-6 md:p-8 rounded-3xl shadow-xl space-y-6 border ${
+              isDark ? "bg-slate-900/90 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900"
+            }`}
+          >
             {/* Scores Overview */}
-            <div className="grid md:grid-cols-2 gap-6 pb-6 border-b border-slate-200">
+            <div className="grid md:grid-cols-2 gap-6 pb-6 border-b border-slate-800/80">
               {/* Job Match Score */}
-              <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 text-center">
-                <p className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+              <div className={`p-5 rounded-2xl border text-center ${
+                isDark ? "bg-slate-950/60 border-slate-800" : "bg-slate-50 border-slate-200"
+              }`}>
+                <p className={`text-xs uppercase font-bold tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   Job Match Score
                 </p>
                 <p
                   className={`text-4xl font-extrabold mt-2 ${
                     result.matchScore >= 80
-                      ? "text-emerald-600"
+                      ? "text-emerald-400"
                       : result.matchScore >= 50
-                        ? "text-amber-500"
-                        : "text-red-500"
+                        ? "text-amber-400"
+                        : "text-red-400"
                   }`}
                 >
                   {result.matchScore}%
                 </p>
-                <div className="w-full bg-slate-200 h-3 rounded-full mt-3 overflow-hidden">
-                  <div
-                    className={`h-full ${
-                      result.matchScore >= 80
-                        ? "bg-emerald-500"
-                        : result.matchScore >= 50
-                          ? "bg-amber-500"
-                          : "bg-red-500"
-                    }`}
-                    style={{ width: `${result.matchScore}%` }}
-                  />
-                </div>
               </div>
 
               {/* ATS Compatibility Score */}
-              <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 text-center">
-                <p className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+              <div className={`p-5 rounded-2xl border text-center ${
+                isDark ? "bg-slate-950/60 border-slate-800" : "bg-slate-50 border-slate-200"
+              }`}>
+                <p className={`text-xs uppercase font-bold tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   ATS Readability Score
                 </p>
-                <p
-                  className={`text-4xl font-extrabold mt-2 ${
-                    (result.atsScore || result.matchScore) >= 80
-                      ? "text-blue-600"
-                      : "text-amber-500"
-                  }`}
-                >
+                <p className="text-4xl font-extrabold mt-2 text-blue-400">
                   {result.atsScore || result.matchScore}%
                 </p>
-                <div className="w-full bg-slate-200 h-3 rounded-full mt-3 overflow-hidden">
-                  <div
-                    className="h-full bg-blue-600 transition-all"
-                    style={{ width: `${result.atsScore || result.matchScore}%` }}
-                  />
-                </div>
               </div>
             </div>
 
-            {/* Detected Role */}
-            <div className="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-sm">
-              <span className="font-bold text-indigo-950">Detected Target Role: </span>
-              <span className="font-semibold text-indigo-700">{result.detectedRole}</span>
-            </div>
-
             {/* Skill Match Heatmap */}
-            <div className="space-y-3">
-              <h3 className="font-bold text-slate-900 text-base">
+            <div className="space-y-4">
+              <h3 className={`font-bold text-base ${isDark ? "text-white" : "text-slate-900"}`}>
                 🎯 Keyword & Skill Heatmap
               </h3>
 
               {/* Matched Skills (Green) */}
               <div>
-                <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-2">
+                <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">
                   🟢 Matched Skills ({result.matchedSkills?.length || 0})
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -324,7 +319,7 @@ const ResumeMatch = () => {
                     result.matchedSkills.map((skill) => (
                       <span
                         key={skill}
-                        className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full border border-emerald-300"
+                        className="bg-emerald-950/80 text-emerald-300 text-xs font-bold px-3 py-1 rounded-lg border border-emerald-800"
                       >
                         ✓ {skill}
                       </span>
@@ -337,7 +332,7 @@ const ResumeMatch = () => {
 
               {/* Missing Skills (Red) */}
               <div>
-                <p className="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">
+                <p className="text-xs font-bold text-red-400 uppercase tracking-wider mb-2">
                   🔴 Missing Target Skills ({result.missingSkills?.length || 0})
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -346,7 +341,7 @@ const ResumeMatch = () => {
                       <span
                         key={skill}
                         onClick={() => handleCopy(`Added ${skill} experience to resume`, skill)}
-                        className="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full border border-red-300 cursor-pointer hover:bg-red-200 transition"
+                        className="bg-red-950/80 text-red-300 text-xs font-bold px-3 py-1 rounded-lg border border-red-800 cursor-pointer hover:bg-red-900 transition"
                         title="Click to copy suggestion"
                       >
                         + {skill}
@@ -359,105 +354,13 @@ const ResumeMatch = () => {
               </div>
             </div>
 
-            {/* ATS Diagnostics */}
-            {result.atsFeedback?.length > 0 && (
-              <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
-                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  📋 ATS Formatting Diagnostics
-                </h4>
-                <ul className="text-xs space-y-1 text-slate-700">
-                  {result.atsFeedback.map((item, idx) => (
-                    <li key={idx} className="flex items-center space-x-2">
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
             {/* Analysis & Suggestions */}
-            <div className="space-y-3 border-t border-slate-200 pt-4">
-              <h3 className="font-bold text-slate-900 text-base">
+            <div className="space-y-3 border-t border-slate-800/80 pt-4">
+              <h3 className={`font-bold text-base ${isDark ? "text-white" : "text-slate-900"}`}>
                 💡 Strategic Analysis & Recommendations
               </h3>
-              <p className="text-sm text-slate-700 leading-relaxed">{result.analysis}</p>
-
-              {result.suggestions?.length > 0 && (
-                <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-sm">
-                  <span className="font-bold text-amber-900">Key Recommendations:</span>
-                  <ul className="list-disc ml-5 mt-2 text-xs text-amber-800 space-y-1">
-                    {result.suggestions.map((s, idx) => (
-                      <li key={idx}>{s}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <p className={`text-sm leading-relaxed ${isDark ? "text-slate-300" : "text-slate-700"}`}>{result.analysis}</p>
             </div>
-
-            {/* Tailored Summary */}
-            {result.improvedSummary && (
-              <div className="border-t border-slate-200 pt-4 space-y-2">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-slate-900 text-base">
-                    ✨ Tailored Resume Summary
-                  </h3>
-                  <button
-                    onClick={() => handleCopy(result.improvedSummary, "summary")}
-                    className="text-xs bg-blue-100 text-blue-700 font-semibold px-3 py-1 rounded-lg hover:bg-blue-200 transition"
-                  >
-                    {copiedField === "summary" ? "✓ Copied!" : "📋 Copy Summary"}
-                  </button>
-                </div>
-                <p className="text-sm text-slate-800 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  {result.improvedSummary}
-                </p>
-              </div>
-            )}
-
-            {/* Tailored Cover Letter */}
-            {result.coverLetter && (
-              <div className="border-t border-slate-200 pt-4 space-y-2">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-slate-900 text-base">
-                    ✉️ Generated Cover Letter ({tone} Tone)
-                  </h3>
-                  <button
-                    onClick={() => handleCopy(result.coverLetter, "coverLetter")}
-                    className="text-xs bg-blue-100 text-blue-700 font-semibold px-3 py-1 rounded-lg hover:bg-blue-200 transition"
-                  >
-                    {copiedField === "coverLetter" ? "✓ Copied!" : "📋 Copy Cover Letter"}
-                  </button>
-                </div>
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
-                  {result.coverLetter}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Recent History */}
-      {history.length > 0 && (
-        <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 space-y-4">
-          <h2 className="text-lg font-bold text-slate-900">
-            Recent Analysis Runs
-          </h2>
-          <div className="grid gap-3">
-            {history.map((item) => (
-              <div key={item.id} className="border border-slate-200 rounded-xl p-4 flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-slate-900">{item.detectedRole}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    {new Date(item.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-bold text-blue-600">{item.matchScore}%</span>
-                  <p className="text-xs text-slate-400">Match</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       )}

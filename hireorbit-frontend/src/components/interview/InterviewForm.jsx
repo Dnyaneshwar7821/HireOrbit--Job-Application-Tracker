@@ -1,38 +1,50 @@
+import { ui } from "../../styles/ui";
+
 const InterviewForm = ({ form, onChange, onSubmit, buttonText }) => {
   return (
     <div className="flex justify-center items-center p-4">
       <form
         onSubmit={onSubmit}
-        className="bg-white p-6 rounded shadow-md w-96"
+        className={`${ui.card} w-full max-w-md space-y-4`}
       >
-        <h2 className="text-xl font-bold mb-4 text-center">
-          {buttonText} Interview
+        <h2 className="text-xl font-extrabold text-white text-center">
+          {buttonText} Interview Round
         </h2>
 
-        <input
-          type="text"
-          name="roundName"
-          value={form.roundName}
-          onChange={onChange}
-          placeholder="Round Name (HR / Technical)"
-          className="w-full mb-3 p-2 border rounded"
-          required
-        />
+        <div>
+          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            Round Name
+          </label>
+          <input
+            type="text"
+            name="roundName"
+            value={form.roundName}
+            onChange={onChange}
+            placeholder="e.g. Technical Round 1 / HR Screening"
+            className={ui.input}
+            required
+          />
+        </div>
 
-        <select
-          name="result"
-          value={form.result}
-          onChange={onChange}
-          className="w-full mb-4 p-2 border rounded"
-        >
-          <option value="PENDING">PENDING</option>
-          <option value="PASS">PASS</option>
-          <option value="FAIL">FAIL</option>
-        </select>
+        <div>
+          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            Result Status
+          </label>
+          <select
+            name="result"
+            value={form.result}
+            onChange={onChange}
+            className={ui.input}
+          >
+            <option value="PENDING">PENDING</option>
+            <option value="PASS">PASS</option>
+            <option value="FAIL">FAIL</option>
+          </select>
+        </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          className={`${ui.buttonPrimary} w-full py-3`}
         >
           {buttonText}
         </button>

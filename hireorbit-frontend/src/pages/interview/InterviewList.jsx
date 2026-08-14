@@ -3,12 +3,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import { interviewService } from "../../api/interviewService";
 import { useApplication } from "../../context/applicationContextValue";
 import { useToast } from "../../context/ToastContext";
+import { useTheme } from "../../context/ThemeContext";
+import { ui } from "../../styles/ui";
 
 const InterviewList = () => {
   const { applicationId } = useParams();
   const navigate = useNavigate();
   const { applications, fetchApplications } = useApplication();
   const { showSuccess, showError } = useToast();
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
 
   const [interviews, setInterviews] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -48,79 +53,103 @@ const InterviewList = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6 font-sans">
       {/* HEADER WITH COMPANY NAME */}
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">
+      <div>
+        <h1 className={`text-2xl font-extrabold tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
           {currentApp
-            ? `${currentApp.companyName} - Interview Rounds`
+            ? `${currentApp.companyName} — Interview Rounds`
             : "Interview Rounds"}
         </h1>
 
         {currentApp && (
-          <p className="text-gray-500 text-sm">Role: {currentApp.jobRole}</p>
+          <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+            Target Role: <span className="font-semibold text-blue-400">{currentApp.jobRole}</span>
+          </p>
         )}
       </div>
 
       {/* ACTION BAR */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center">
         <button
           onClick={() => navigate("/applications")}
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          className={ui.buttonSecondary}
         >
-          ← Back
+          ← Back to Applications
         </button>
 
         <button
           onClick={() => navigate(`/interviews/add/${applicationId}`)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className={ui.buttonPrimary}
         >
-          + Add Interview
+          + Add Interview Round
         </button>
       </div>
 
       {/* LIST */}
       {interviews.length === 0 ? (
-        <p className="text-gray-500">No interviews found</p>
+        <div className={ui.emptyState}>
+          No interview rounds added for this application yet.
+        </div>
       ) : (
         <div className="grid gap-4">
           {interviews.map((int) => (
-            <div key={int.id} className="bg-white p-4 rounded shadow">
-              <h2 className="font-semibold">{int.roundName}</h2>
+            <div
+              key={int.id}
+              className={`p-5 rounded-2xl border transition shadow-xl ${
+                isDark
+                  ? "bg-slate-900/90 border-slate-800 text-white"
+                  : "bg-white border-slate-200 text-slate-900 shadow-slate-200/50"
+              }`}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="font-bold text-lg">{int.roundName}</h2>
+                  <p className="text-xs text-blue-400 font-semibold mt-1">Date: {int.date}</p>
+                </div>
 
-              {editingId === int.id ? (
-                <>
-                  <select
-                    value={editResult}
-                    onChange={(e) => setEditResult(e.target.value)}
-                    className="border p-2 mt-2"
-                  >
-                    <option value="PENDING">PENDING</option>
-                    <option value="PASS">PASS</option>
-                    <option value="FAIL">FAIL</option>
-                  </select>
+                <span
+                  className={`text-xs px-3 py-1 rounded-full font-extrabold border ${
+                    int.result === "PASS"
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : int.result === "FAIL"
+                      ? "bg-red-500/10 text-red-400 border-red-500/20"
+                      : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                  }`}
+                >
+                  {int.result}
+                </span>
+              </div>
 
-                  <button
-                    onClick={() => saveEdit(int.id)}
-                    className="ml-2 bg-green-500 text-white px-3 py-1 rounded"
-                  >
-                    Save
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p className="text-gray-600">{int.result}</p>
+              <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                {editingId === int.id ? (
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={editResult}
+                      onChange={(e) => setEditResult(e.target.value)}
+                      className={ui.input}
+                    >
+                      <option value="PENDING">PENDING</option>
+                      <option value="PASS">PASS</option>
+                      <option value="FAIL">FAIL</option>
+                    </select>
 
+                    <button
+                      onClick={() => saveEdit(int.id)}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow transition"
+                    >
+                      Save
+                    </button>
+                  </div>
+                ) : (
                   <button
                     onClick={() => startEdit(int)}
-                    className="mt-2 bg-yellow-500 text-white px-3 py-1 rounded"
+                    className={ui.buttonSecondary}
                   >
-                    Edit
+                    Edit Status
                   </button>
-                </>
-              )}
-
-              <p className="text-sm text-blue-600 mt-2">{int.date}</p>
+                )}
+              </div>
             </div>
           ))}
         </div>

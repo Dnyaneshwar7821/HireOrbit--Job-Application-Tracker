@@ -233,7 +233,7 @@ const AllApplications = () => {
             className={
               view === mode
                 ? ui.buttonPrimary
-                : "bg-white border px-4 py-2 rounded-lg"
+                : "bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 px-4 py-2 rounded-xl text-xs font-bold transition"
             }
           >
             {mode[0].toUpperCase() + mode.slice(1)}

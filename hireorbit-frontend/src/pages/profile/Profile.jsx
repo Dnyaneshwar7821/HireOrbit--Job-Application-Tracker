@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../api/authService";
 import { useToast } from "../../context/ToastContext";
+import { useTheme } from "../../context/ThemeContext";
 
 const Profile = () => {
   const [user, setUser] = useState(() => {
@@ -17,6 +18,9 @@ const Profile = () => {
 
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
 
   useEffect(() => {
     authService
@@ -42,46 +46,74 @@ const Profile = () => {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Profile</h1>
+    <div className="p-6 max-w-3xl mx-auto font-sans min-h-[80vh]">
+      <h1 className={`text-3xl font-extrabold mb-6 tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+        User Profile
+      </h1>
 
-      <div className="bg-white p-6 rounded-xl shadow">
+      <div
+        className={`p-6 rounded-3xl border shadow-xl backdrop-blur-xl transition-colors duration-200 ${
+          isDark
+            ? "bg-slate-900/90 border-slate-800 text-slate-100"
+            : "bg-white border-slate-200 text-slate-900 shadow-slate-200/50"
+        }`}
+      >
         {/* USER INFO */}
-        <p className="mb-3">
-          <span className="font-semibold">Name:</span> {user?.name || "N/A"}
-        </p>
+        <div className="space-y-4 text-sm">
+          <div className="flex items-center justify-between border-b pb-3 border-slate-700/50">
+            <span className={`font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              Full Name
+            </span>
+            <span className="font-bold">{user?.name || "N/A"}</span>
+          </div>
 
-        <p className="mb-3">
-          <span className="font-semibold">Email:</span> {user?.email || "N/A"}
-        </p>
+          <div className="flex items-center justify-between border-b pb-3 border-slate-700/50">
+            <span className={`font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              Email Address
+            </span>
+            <span className="font-bold">{user?.email || "N/A"}</span>
+          </div>
 
-        <p>
-          <span className="font-semibold">Role:</span> {user?.role || "USER"}
-        </p>
+          <div className="flex items-center justify-between pb-1">
+            <span className={`font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              Account Role
+            </span>
+            <span className="font-extrabold text-xs bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20">
+              {user?.role || "USER"}
+            </span>
+          </div>
+        </div>
 
-        <div className="mt-6 border-t pt-4">
+        <div className="mt-8 border-t pt-6 border-slate-700/50">
           <button
             onClick={() => setShowDelete(!showDelete)}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-5 py-2.5 rounded-xl font-bold text-xs transition"
           >
-            Delete Account
+            {showDelete ? "Cancel Account Deletion" : "Delete Account"}
           </button>
 
           {showDelete && (
-            <div className="mt-4">
+            <div className="mt-4 p-4 rounded-2xl border border-red-500/30 bg-red-500/5 space-y-3">
+              <p className="text-xs text-red-300 font-semibold">
+                ⚠️ Warning: Enter your password below to permanently delete your account and data.
+              </p>
               <input
                 type="password"
                 placeholder="Enter password to confirm"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 border rounded-lg mb-3 focus:ring-2 focus:ring-red-400 outline-none"
+                className={`w-full p-3 rounded-xl border text-sm outline-none ${
+                  isDark
+                    ? "bg-slate-950 border-slate-800 text-white placeholder-slate-500"
+                    : "bg-white border-slate-300 text-slate-900 placeholder-slate-400"
+                }`}
               />
 
               <button
                 onClick={handleDelete}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-xl transition shadow-lg shadow-red-600/20"
               >
-                Confirm Delete
+                Permanently Confirm & Delete Account
               </button>
             </div>
           )}
