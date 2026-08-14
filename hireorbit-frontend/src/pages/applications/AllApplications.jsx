@@ -3,8 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import ApplicationCard from "../../components/applications/ApplicationCard";
 import { useApplication } from "../../context/applicationContextValue";
 import { ui } from "../../styles/ui";
-
 import { useToast } from "../../context/ToastContext";
+import { useTheme } from "../../context/ThemeContext";
 
 const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"];
 const VIEWS = ["list", "kanban", "timeline"];
@@ -12,6 +12,9 @@ const VIEWS = ["list", "kanban", "timeline"];
 const AllApplications = () => {
   const { applications, deleteApplication, updateApplication } = useApplication();
   const { showSuccess, showError, showInfo } = useToast();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState(
@@ -131,9 +134,14 @@ const AllApplications = () => {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
-        <h1 className="text-2xl font-bold">All Applications</h1>
+    <div className={`p-4 md:p-6 max-w-7xl mx-auto space-y-6 font-sans min-h-[85vh] ${
+      isDark ? "text-slate-100" : "text-slate-900"
+    }`}>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+        <h1 className={`text-3xl font-extrabold tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+          All Applications
+        </h1>
 
         <div className="flex gap-2">
           <button onClick={exportToCSV} className={ui.buttonSecondary}>
@@ -148,25 +156,31 @@ const AllApplications = () => {
         </div>
       </div>
 
+      {/* Follow ups summary widget */}
       {upcomingFollowUps.length > 0 && (
-        <div className={`${ui.card} mb-4`}>
-          <h2 className="font-semibold mb-2">Upcoming Follow-ups</h2>
-          <div className="grid md:grid-cols-3 gap-2">
+        <div className={`${ui.card} space-y-3`}>
+          <h2 className="font-bold text-sm tracking-wide uppercase text-amber-500">Upcoming Follow-ups</h2>
+          <div className="grid md:grid-cols-3 gap-3">
             {upcomingFollowUps.map((app) => (
               <button
                 key={app.id}
                 onClick={() => navigate(`/applications/${app.id}`)}
-                className="text-left border rounded-lg p-3 hover:bg-blue-50"
+                className={`text-left border rounded-xl p-3.5 transition ${
+                  isDark
+                    ? "border-slate-800 bg-slate-950/70 hover:border-slate-700"
+                    : "border-slate-200 bg-slate-50 hover:bg-slate-100"
+                }`}
               >
-                <p className="font-medium">{app.companyName}</p>
-                <p className="text-sm text-gray-600">{app.followUpDate}</p>
+                <p className="font-bold text-sm">{app.companyName}</p>
+                <p className="text-xs text-amber-600 font-semibold mt-1">Follow-up: {app.followUpDate}</p>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      <div className="grid md:grid-cols-5 gap-3 mb-4">
+      {/* Filters Bar */}
+      <div className="grid md:grid-cols-5 gap-3">
         <input
           type="text"
           placeholder="Search company, role, notes..."
@@ -225,7 +239,8 @@ const AllApplications = () => {
         </button>
       </div>
 
-      <div className="flex gap-2 mb-4">
+      {/* View Selector Tabs */}
+      <div className="flex gap-2">
         {VIEWS.map((mode) => (
           <button
             key={mode}
@@ -233,7 +248,9 @@ const AllApplications = () => {
             className={
               view === mode
                 ? ui.buttonPrimary
-                : "bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 px-4 py-2 rounded-xl text-xs font-bold transition"
+                : isDark
+                ? "bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 px-4 py-2 rounded-xl text-xs font-bold transition"
+                : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 shadow-sm px-4 py-2 rounded-xl text-xs font-bold transition"
             }
           >
             {mode[0].toUpperCase() + mode.slice(1)}
@@ -241,6 +258,7 @@ const AllApplications = () => {
         ))}
       </div>
 
+      {/* Applications Output */}
       {applications.length === 0 ? (
         <div className={ui.emptyState}>
           No applications yet. Start by adding one.
@@ -248,9 +266,9 @@ const AllApplications = () => {
       ) : filteredApplications.length === 0 ? (
         <div className={ui.emptyState}>No matching applications found</div>
       ) : view === "kanban" ? (
-        <KanbanView applications={filteredApplications} onMove={moveApplication} />
+        <KanbanView applications={filteredApplications} onMove={moveApplication} isDark={isDark} />
       ) : view === "timeline" ? (
-        <TimelineView applications={filteredApplications} />
+        <TimelineView applications={filteredApplications} isDark={isDark} />
       ) : (
         <div className="grid gap-4">
           {filteredApplications.map((app) => (
@@ -262,7 +280,7 @@ const AllApplications = () => {
   );
 };
 
-const KanbanView = ({ applications, onMove }) => (
+const KanbanView = ({ applications, onMove, isDark }) => (
   <div className="grid md:grid-cols-4 gap-4">
     {STATUSES.map((status) => (
       <div
@@ -276,9 +294,11 @@ const KanbanView = ({ applications, onMove }) => (
             onMove(app, status);
           }
         }}
-        className="bg-gray-100 rounded-lg p-3 min-h-72"
+        className={`rounded-2xl p-4 min-h-72 border transition ${
+          isDark ? "bg-slate-900/80 border-slate-800" : "bg-slate-100 border-slate-200"
+        }`}
       >
-        <h2 className="font-bold mb-3">{status}</h2>
+        <h2 className={`font-bold mb-3 text-sm tracking-wider uppercase ${isDark ? "text-white" : "text-slate-900"}`}>{status}</h2>
         <div className="space-y-3">
           {applications
             .filter((app) => app.status === status)
@@ -289,12 +309,16 @@ const KanbanView = ({ applications, onMove }) => (
                 onDragStart={(e) =>
                   e.dataTransfer.setData("text/plain", String(app.id))
                 }
-                className="bg-white rounded-lg p-3 shadow cursor-move"
+                className={`rounded-xl p-3.5 shadow-md cursor-move border transition ${
+                  isDark
+                    ? "bg-slate-950 border-slate-800 text-white"
+                    : "bg-white border-slate-200 text-slate-900 shadow-slate-200/50"
+                }`}
               >
-                <p className="font-semibold">{app.companyName}</p>
-                <p className="text-sm text-gray-600">{app.jobRole}</p>
+                <p className="font-bold text-sm">{app.companyName}</p>
+                <p className="text-xs text-blue-500 font-semibold mt-0.5">{app.jobRole}</p>
                 {app.followUpDate && (
-                  <p className="text-xs text-orange-600 mt-1">
+                  <p className="text-[11px] text-amber-500 font-bold mt-2">
                     Follow up: {app.followUpDate}
                   </p>
                 )}
@@ -306,21 +330,23 @@ const KanbanView = ({ applications, onMove }) => (
   </div>
 );
 
-const TimelineView = ({ applications }) => (
-  <div className="bg-white rounded-lg shadow p-4">
+const TimelineView = ({ applications, isDark }) => (
+  <div className={`rounded-2xl border p-6 shadow-xl ${
+    isDark ? "bg-slate-900 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-900 shadow-slate-200/50"
+  }`}>
     {applications.map((app) => (
-      <div key={app.id} className="border-l-4 border-blue-500 pl-4 pb-5">
-        <p className="text-sm text-gray-500">{app.appliedDate}</p>
-        <h2 className="font-bold">
-          {app.companyName} - {app.jobRole}
+      <div key={app.id} className="border-l-4 border-blue-500 pl-4 pb-6 space-y-1">
+        <p className="text-xs font-bold text-blue-400">{app.appliedDate}</p>
+        <h2 className="font-extrabold text-base">
+          {app.companyName} — {app.jobRole}
         </h2>
-        <p className="text-sm text-gray-600">Status: {app.status}</p>
+        <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>Status: <span className="font-bold text-blue-500">{app.status}</span></p>
         {app.followUpDate && (
-          <p className="text-sm text-orange-600">
+          <p className="text-xs font-bold text-amber-500">
             Follow-up scheduled for {app.followUpDate}
           </p>
         )}
-        {app.notes && <p className="text-sm mt-1">{app.notes}</p>}
+        {app.notes && <p className={`text-xs mt-1 ${isDark ? "text-slate-300" : "text-slate-700"}`}>{app.notes}</p>}
       </div>
     ))}
   </div>
