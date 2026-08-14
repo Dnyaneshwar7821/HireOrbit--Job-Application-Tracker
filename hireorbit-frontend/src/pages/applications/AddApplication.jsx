@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ApplicationForm from "../../components/applications/ApplicationForm";
 import { useApplication } from "../../context/applicationContextValue";
+import { useToast } from "../../context/ToastContext";
 
 const AddApplication = () => {
   const navigate = useNavigate();
   const { addApplication } = useApplication();
+  const { showSuccess, showError } = useToast();
 
   const [form, setForm] = useState({
     companyName: "",
@@ -32,11 +34,15 @@ const AddApplication = () => {
 
     addApplication(form)
       .then(() => {
-        alert("Application added");
+        showSuccess("Job application created!");
         navigate("/applications");
       })
       .catch((err) => {
-        alert(err.response?.data || "Error adding application");
+        showError(
+          err.response?.data?.message ||
+            err.response?.data ||
+            "Error adding application",
+        );
       });
   };
 
@@ -45,7 +51,7 @@ const AddApplication = () => {
       form={form}
       onChange={handleChange}
       onSubmit={handleSubmit}
-      buttonText="Add"
+      buttonText="Add Application"
     />
   );
 };

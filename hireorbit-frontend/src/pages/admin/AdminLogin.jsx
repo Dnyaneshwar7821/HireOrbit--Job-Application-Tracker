@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { adminService } from "../../api/adminService";
 import { useAuth } from "../../context/authContextValue";
 
+import { useToast } from "../../context/ToastContext";
+
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,6 +12,7 @@ const AdminLogin = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { showSuccess, showError } = useToast();
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
@@ -19,14 +22,16 @@ const AdminLogin = () => {
     try {
       const res = await adminService.adminLogin(email, password);
       login(res.data.token);
+      showSuccess("Welcome, Administrator!");
       navigate("/admin/dashboard");
     } catch (err) {
-      setError(
+      const msg =
         err.response?.data?.message ||
-          err.response?.data ||
-          err.message ||
-          "Admin login failed",
-      );
+        err.response?.data ||
+        err.message ||
+        "Admin login failed";
+      setError(msg);
+      showError(msg);
     } finally {
       setLoading(false);
     }

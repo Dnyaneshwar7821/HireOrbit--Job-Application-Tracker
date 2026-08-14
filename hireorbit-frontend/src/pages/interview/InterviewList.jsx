@@ -2,12 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { interviewService } from "../../api/interviewService";
 import { useApplication } from "../../context/applicationContextValue";
+import { useToast } from "../../context/ToastContext";
 
 const InterviewList = () => {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-
   const { applications, fetchApplications } = useApplication();
+  const { showSuccess, showError } = useToast();
 
   const [interviews, setInterviews] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -19,8 +20,8 @@ const InterviewList = () => {
     interviewService
       .getInterviews(applicationId)
       .then((res) => setInterviews(res.data))
-      .catch(() => alert("Error fetching interviews"));
-  }, [applicationId]);
+      .catch(() => showError("Error fetching interviews"));
+  }, [applicationId, showError]);
 
   useEffect(() => {
     fetchInterviews();
@@ -38,11 +39,11 @@ const InterviewList = () => {
       });
 
       setEditingId(null);
-
       fetchInterviews();
       await fetchApplications();
+      showSuccess("Interview result updated!");
     } catch {
-      alert("Update failed");
+      showError("Update failed");
     }
   };
 

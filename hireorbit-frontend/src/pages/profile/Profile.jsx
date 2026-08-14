@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../api/authService";
+import { useToast } from "../../context/ToastContext";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -10,31 +11,29 @@ const Profile = () => {
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     authService
       .getProfile()
       .then((res) => setUser(res.data))
-      .catch(() => console.error("Profile fetch failed"))
+      .catch(() => showError("Profile fetch failed"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [showError]);
 
   const handleDelete = async () => {
     if (!password) {
-      alert("Enter password to confirm");
+      showError("Enter password to confirm deletion");
       return;
     }
 
     try {
       await authService.deleteAccount(password);
-
-      alert("Account deleted successfully");
-
+      showSuccess("Account deleted successfully");
       localStorage.clear();
-
       navigate("/login");
     } catch (err) {
-      alert(err.response?.data || "Delete failed");
+      showError(err.response?.data?.message || err.response?.data || "Delete failed");
     }
   };
 

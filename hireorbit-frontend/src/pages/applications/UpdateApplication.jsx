@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useApplication } from "../../context/applicationContextValue";
 import ApplicationForm from "../../components/applications/ApplicationForm";
+import { useToast } from "../../context/ToastContext";
 
 const UpdateApplicationForm = ({ application, updateApplication }) => {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useToast();
   const [form, setForm] = useState({
     companyName: application.companyName,
     jobRole: application.jobRole,
@@ -27,10 +29,10 @@ const UpdateApplicationForm = ({ application, updateApplication }) => {
 
     try {
       await updateApplication(application.id, form);
-      alert("Updated successfully");
+      showSuccess("Application updated successfully!");
       navigate("/applications");
     } catch {
-      alert("Update failed");
+      showError("Failed to update application");
     }
   };
 
@@ -39,7 +41,7 @@ const UpdateApplicationForm = ({ application, updateApplication }) => {
       form={form}
       onChange={handleChange}
       onSubmit={handleSubmit}
-      buttonText="Update"
+      buttonText="Update Application"
     />
   );
 };

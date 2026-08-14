@@ -5,9 +5,12 @@ import { useApplication } from "../../context/applicationContextValue";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ui } from "../../styles/ui";
 
+import { useToast } from "../../context/ToastContext";
+
 const Login = () => {
   const navigate = useNavigate();
   const { fetchApplications } = useApplication();
+  const { showSuccess, showError } = useToast();
 
   const [form, setForm] = useState({
     email: "",
@@ -36,10 +39,11 @@ const Login = () => {
       const profileRes = await authService.getProfile();
       localStorage.setItem("user", JSON.stringify(profileRes.data));
 
+      showSuccess("Welcome back!");
       navigate("/dashboard");
       fetchApplications();
     } catch (error) {
-      alert(error.response?.data || error.message || "Login failed");
+      showError(error.response?.data?.message || error.response?.data || error.message || "Login failed");
     } finally {
       setLoading(false);
     }

@@ -3,8 +3,11 @@ import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../../api/authService";
 import { ui } from "../../styles/ui";
 
+import { useToast } from "../../context/ToastContext";
+
 const Register = () => {
   const navigate = useNavigate();
+  const { showSuccess, showError } = useToast();
 
   const [form, setForm] = useState({
     name: "",
@@ -33,9 +36,9 @@ const Register = () => {
     e.preventDefault();
 
     if (!validatePassword(form.password)) {
-      setError(
-        "Password must be 8+ chars with uppercase, lowercase, number and special character",
-      );
+      const msg = "Password must be 8+ chars with uppercase, lowercase, number and special character";
+      setError(msg);
+      showError(msg);
       return;
     }
 
@@ -43,11 +46,13 @@ const Register = () => {
     authService
       .register(form)
       .then((res) => {
-        alert(res.data.message);
+        showSuccess(res.data?.message || "Account registered successfully!");
         navigate("/login");
       })
       .catch((error) => {
-        setError(error.response?.data || error.message || "Registration failed");
+        const msg = error.response?.data?.message || error.response?.data || error.message || "Registration failed";
+        setError(msg);
+        showError(msg);
       })
       .finally(() => {
         setLoading(false);

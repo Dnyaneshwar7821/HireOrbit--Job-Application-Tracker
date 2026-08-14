@@ -4,11 +4,14 @@ import ApplicationCard from "../../components/applications/ApplicationCard";
 import { useApplication } from "../../context/applicationContextValue";
 import { ui } from "../../styles/ui";
 
+import { useToast } from "../../context/ToastContext";
+
 const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"];
 const VIEWS = ["list", "kanban", "timeline"];
 
 const AllApplications = () => {
   const { applications, deleteApplication, updateApplication } = useApplication();
+  const { showSuccess, showError, showInfo } = useToast();
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState(
@@ -23,8 +26,8 @@ const AllApplications = () => {
 
   const handleDelete = (id) => {
     deleteApplication(id)
-      .then(() => alert("Deleted successfully"))
-      .catch(() => alert("Delete failed"));
+      .then(() => showSuccess("Application deleted"))
+      .catch(() => showError("Failed to delete application"));
   };
 
   const filteredApplications = useMemo(() => {
@@ -88,7 +91,7 @@ const AllApplications = () => {
 
   const exportToCSV = () => {
     if (!filteredApplications.length) {
-      alert("No applications to export");
+      showInfo("No applications to export");
       return;
     }
     const headers = [
