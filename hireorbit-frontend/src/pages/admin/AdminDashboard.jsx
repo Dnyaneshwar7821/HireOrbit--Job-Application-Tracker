@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { adminService } from "../../api/adminService";
+import { FaTrash, FaExclamationTriangle, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [roleUpdatingId, setRoleUpdatingId] = useState(null);
+
+  // Custom Modal & Toast States (No system popups)
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   const loadAdminData = async () => {
     setLoading(true);
@@ -18,7 +28,7 @@ const AdminDashboard = () => {
       setStats(statsRes.data);
       setUsers(usersRes.data);
     } catch {
-      console.error("Failed to load admin dashboard data");
+      showToast("Failed to load admin metrics", "error");
     } finally {
       setLoading(false);
     }
@@ -28,37 +38,26 @@ const AdminDashboard = () => {
     loadAdminData();
   }, []);
 
-  const handleRoleToggle = async (userId, currentRole) => {
-    const newRole = currentRole === "ADMIN" ? "USER" : "ADMIN";
-    setRoleUpdatingId(userId);
-    try {
-      await adminService.updateUserRole(userId, newRole);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)),
-      );
-    } catch {
-      alert("Failed to update user role");
-    } finally {
-      setRoleUpdatingId(null);
-    }
-  };
-
-  const handleDeleteUser = async (userId, userEmail) => {
-    if (!window.confirm(`Are you sure you want to delete user ${userEmail}?`)) {
-      return;
-    }
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    setDeleting(true);
 
     try {
-      await adminService.deleteUser(userId);
-      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      await adminService.deleteUser(userToDelete.id);
+      setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+      setUserToDelete(null);
+      showToast(`User ${userToDelete.email} deleted successfully.`, "success");
       loadAdminData();
     } catch (err) {
-      alert(
+      const msg =
         err.response?.data?.message ||
-          err.response?.data ||
-          err.message ||
-          "Failed to delete user",
-      );
+        err.response?.data ||
+        err.message ||
+        "Failed to delete user";
+      setUserToDelete(null);
+      showToast(msg, "error");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -77,7 +76,63 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {/* Toast Notification Popup */}
+      {toast && (
+        <div
+          className={`fixed top-5 right-5 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border backdrop-blur-md text-sm font-semibold animate-bounce ${
+            toast.type === "error"
+              ? "bg-red-950/90 text-red-200 border-red-800"
+              : "bg-emerald-950/90 text-emerald-200 border-emerald-800"
+          }`}
+        >
+          {toast.type === "error" ? (
+            <FaTimesCircle className="text-red-400 text-lg" />
+          ) : (
+            <FaCheckCircle className="text-emerald-400 text-lg" />
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal Popup */}
+      {userToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div className="flex items-center gap-3 text-amber-400">
+              <FaExclamationTriangle className="text-2xl" />
+              <h3 className="text-lg font-bold text-white">Confirm Account Deletion</h3>
+            </div>
+
+            <p className="text-sm text-slate-300">
+              Are you sure you want to delete <span className="font-bold text-white">{userToDelete.email}</span>?
+            </p>
+            <p className="text-xs text-slate-400">
+              This will permanently delete their account and all associated applications, interview stages, and resume history.
+            </p>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setUserToDelete(null)}
+                disabled={deleting}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteUser}
+                disabled={deleting}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Yes, Delete User"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Title */}
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">
@@ -176,7 +231,7 @@ const AdminDashboard = () => {
           <div>
             <h2 className="text-lg font-bold text-white">User Management</h2>
             <p className="text-xs text-slate-400">
-              View users, manage roles, and delete accounts
+              View registered users and delete test accounts
             </p>
           </div>
 
@@ -224,20 +279,17 @@ const AdminDashboard = () => {
                       </span>
                     </td>
                     <td className="p-3">{u.applicationCount} jobs</td>
-                    <td className="p-3 text-right space-x-2">
-                      <button
-                        onClick={() => handleRoleToggle(u.id, u.role)}
-                        disabled={roleUpdatingId === u.id}
-                        className="text-xs bg-slate-800 hover:bg-slate-700 text-indigo-300 px-3 py-1 rounded border border-slate-700 transition"
-                      >
-                        Make {u.role === "ADMIN" ? "User" : "Admin"}
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(u.id, u.email)}
-                        className="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 px-2.5 py-1 rounded border border-red-500/30 transition"
-                      >
-                        Delete
-                      </button>
+                    <td className="p-3 text-right">
+                      {u.email === "admin@hireorbit.com" ? (
+                        <span className="text-xs text-slate-500 italic">Primary Admin</span>
+                      ) : (
+                        <button
+                          onClick={() => setUserToDelete(u)}
+                          className="inline-flex items-center gap-1.5 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg border border-red-500/30 transition font-semibold"
+                        >
+                          <FaTrash className="text-[10px]" /> Delete Account
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
