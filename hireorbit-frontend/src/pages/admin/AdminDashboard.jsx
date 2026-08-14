@@ -18,8 +18,10 @@ const AdminDashboard = () => {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const loadAdminData = async () => {
-    setLoading(true);
+  const loadAdminData = async (isInitial = false) => {
+    if (isInitial) {
+      setLoading(true);
+    }
     try {
       const [statsRes, usersRes] = await Promise.all([
         adminService.getStats(),
@@ -30,12 +32,14 @@ const AdminDashboard = () => {
     } catch {
       showToast("Failed to load admin metrics", "error");
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    loadAdminData();
+    loadAdminData(true);
   }, []);
 
   const confirmDeleteUser = async () => {
@@ -47,7 +51,7 @@ const AdminDashboard = () => {
       setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
       setUserToDelete(null);
       showToast(`User ${userToDelete.email} deleted successfully.`, "success");
-      loadAdminData();
+      loadAdminData(false);
     } catch (err) {
       const msg =
         err.response?.data?.message ||
