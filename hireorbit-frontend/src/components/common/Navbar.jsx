@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useApplication } from "../../context/applicationContextValue";
+import { useAuth } from "../../context/authContextValue";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard" },
@@ -12,6 +13,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const { clearApplications } = useApplication();
+  const { isAdmin } = useAuth();
 
   const handleLogout = () => {
     localStorage.clear();
@@ -52,12 +54,14 @@ const Navbar = () => {
               </NavLink>
             ))}
 
-            <Link
-              to="/admin/dashboard"
-              className="rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-2 font-medium transition border border-indigo-200"
-            >
-              👑 Admin Panel
-            </Link>
+            {isAdmin && (
+              <Link
+                to="/admin/dashboard"
+                className="rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-2 font-medium transition border border-indigo-200"
+              >
+                👑 Admin Panel
+              </Link>
+            )}
 
             <button
               onClick={handleLogout}
