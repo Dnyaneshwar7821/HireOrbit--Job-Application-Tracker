@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../../api/authService";
 import { ui } from "../../styles/ui";
-
 import { useToast } from "../../context/ToastContext";
 
 const Register = () => {
@@ -36,7 +35,8 @@ const Register = () => {
     e.preventDefault();
 
     if (!validatePassword(form.password)) {
-      const msg = "Password must be 8+ chars with uppercase, lowercase, number and special character";
+      const msg =
+        "Password must be 8+ chars with uppercase, lowercase, number and special character";
       setError(msg);
       showError(msg);
       return;
@@ -50,7 +50,11 @@ const Register = () => {
         navigate("/login");
       })
       .catch((error) => {
-        const msg = error.response?.data?.message || error.response?.data || error.message || "Registration failed";
+        const msg =
+          error.response?.data?.message ||
+          error.response?.data ||
+          error.message ||
+          "Registration failed";
         setError(msg);
         showError(msg);
       })
@@ -60,79 +64,93 @@ const Register = () => {
   };
 
   return (
-    <div className="grid min-h-screen place-items-center px-4 py-10">
+    <div className="grid min-h-screen place-items-center px-4 py-10 bg-slate-950 font-sans text-slate-100">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-xl"
+        className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-xl space-y-4"
       >
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-xl font-bold text-white">
+        <div className="text-center">
+          <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-xl font-black text-white shadow-lg shadow-blue-500/20">
             H
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-950">
+          <h2 className="text-2xl font-black tracking-tight text-white">
             Create your account
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-xs text-slate-400">
             Start organizing your job search in one place.
           </p>
         </div>
 
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Name
-        </label>
-        <input
-          type="text"
-          name="name"
-          placeholder="Your name"
-          onChange={handleChange}
-          className={`${ui.input} mb-4`}
-          required
-        />
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">
+            Full Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            placeholder="Your name"
+            onChange={handleChange}
+            className={ui.input}
+            required
+          />
+        </div>
 
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Email
-        </label>
-        <input
-          type="email"
-          name="email"
-          placeholder="you@example.com"
-          onChange={handleChange}
-          className={`${ui.input} mb-4`}
-          required
-        />
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">
+            Email Address
+          </label>
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            onChange={handleChange}
+            className={ui.input}
+            required
+          />
+        </div>
 
-        <label className="mb-2 block text-sm font-medium text-slate-700">
-          Password
-        </label>
-        <input
-          type="password"
-          name="password"
-          placeholder="Create a strong password"
-          onChange={handleChange}
-          className={`${ui.input} mb-2`}
-          required
-        />
-
-        <p className="mb-3 text-xs leading-5 text-slate-500">
-          Must be 8+ chars with uppercase, lowercase, number and special char.
-        </p>
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">
+            Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Create a strong password"
+            onChange={handleChange}
+            className={ui.input}
+            required
+          />
+          <p className="mt-1 text-[11px] text-slate-500 leading-tight">
+            Must be 8+ chars with uppercase, lowercase, number and special char.
+          </p>
+        </div>
 
         {error && (
-          <p className="mb-3 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+          <p className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300 font-semibold">
             {error}
           </p>
         )}
 
-        <button type="submit" disabled={loading} className={`${ui.buttonPrimary} w-full`}>
-          {loading ? "Creating account..." : "Register"}
+        <button
+          type="submit"
+          disabled={loading}
+          className={`${ui.buttonPrimary} w-full py-3.5`}
+        >
+          {loading ? "Creating account..." : "Register Account"}
         </button>
 
-        <p className="mt-5 text-center text-sm text-slate-500">
-          Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-700">
-            Login
-          </Link>
-        </p>
+        <div className="pt-3 border-t border-slate-800/80 text-center text-xs text-slate-400">
+          <p>
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-bold text-blue-400 hover:text-blue-300 transition"
+            >
+              Login
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );

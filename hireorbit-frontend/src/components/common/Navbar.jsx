@@ -1,7 +1,8 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useApplication } from "../../context/applicationContextValue";
 import { useAuth } from "../../context/authContextValue";
-import { FaChartPie, FaBriefcase, FaBrain, FaUser, FaSignOutAlt, FaShieldAlt } from "react-icons/fa";
+import { useTheme } from "../../context/ThemeContext";
+import { FaChartPie, FaBriefcase, FaBrain, FaUser, FaSignOutAlt, FaShieldAlt, FaSun, FaMoon } from "react-icons/fa";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: FaChartPie },
@@ -15,6 +16,7 @@ const Navbar = () => {
   const token = localStorage.getItem("token");
   const { clearApplications } = useApplication();
   const { isAdmin } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     localStorage.clear();
@@ -63,6 +65,16 @@ const Navbar = () => {
                 );
               })}
             </div>
+
+            {/* Dark / Light Mode Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 px-3 py-2 text-xs font-bold text-amber-400 transition"
+              title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
+            >
+              {theme === "dark" ? <FaSun className="text-amber-400" /> : <FaMoon className="text-indigo-400" />}
+              <span className="hidden sm:inline">{theme === "dark" ? "Light" : "Dark"}</span>
+            </button>
 
             {isAdmin && (
               <Link
