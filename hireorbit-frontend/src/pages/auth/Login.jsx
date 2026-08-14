@@ -5,10 +5,12 @@ import { useApplication } from "../../context/applicationContextValue";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ui } from "../../styles/ui";
 
+import { useAuth } from "../../context/authContextValue";
 import { useToast } from "../../context/ToastContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const { fetchApplications } = useApplication();
   const { showSuccess, showError } = useToast();
 
@@ -34,7 +36,7 @@ const Login = () => {
       localStorage.clear();
 
       const loginRes = await authService.login(form);
-      localStorage.setItem("token", loginRes.data.token);
+      login(loginRes.data.token);
 
       const profileRes = await authService.getProfile();
       localStorage.setItem("user", JSON.stringify(profileRes.data));
