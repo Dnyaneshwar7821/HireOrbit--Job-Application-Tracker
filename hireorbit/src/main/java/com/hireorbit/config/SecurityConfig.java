@@ -24,6 +24,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						// ✅ Public endpoints
 						.requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
+						// 👑 Admin endpoints
+						.requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
 						// 🔒 All other endpoints require authentication
 						.anyRequest().authenticated())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

@@ -35,6 +35,11 @@ public class AuthController {
 		return authService.login(request);
 	}
 
+	@PostMapping("/admin-login")
+	public AuthResponse adminLogin(@Valid @RequestBody LoginRequest request) {
+		return authService.adminLogin(request);
+	}
+
 	@GetMapping("/profile")
 	public ResponseEntity<?> getProfile(Authentication authentication) {
 

@@ -52,6 +52,13 @@ const Navbar = () => {
               </NavLink>
             ))}
 
+            <Link
+              to="/admin/dashboard"
+              className="rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-2 font-medium transition border border-indigo-200"
+            >
+              👑 Admin Panel
+            </Link>
+
             <button
               onClick={handleLogout}
               className="rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"

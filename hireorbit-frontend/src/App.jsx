@@ -23,7 +23,11 @@ const InterviewList = lazy(() => import("./pages/interview/InterviewList"));
 const Profile = lazy(() => import("./pages/profile/Profile"));
 const ResumeMatch = lazy(() => import("./pages/ResumeMatch"));
 
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+
 import Layout from "./components/common/Layout";
+import AdminLayout from "./components/admin/AdminLayout";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 function App() {
@@ -42,8 +46,9 @@ function App() {
         {/* Public */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Protected */}
+        {/* Protected User Panel */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -72,6 +77,13 @@ function App() {
 
             {/* Profile */}
             <Route path="/profile" element={<Profile />} />
+          </Route>
+        </Route>
+
+        {/* Protected Admin Panel */}
+        <Route element={<ProtectedRoute adminOnly={true} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
           </Route>
         </Route>
       </Routes>
