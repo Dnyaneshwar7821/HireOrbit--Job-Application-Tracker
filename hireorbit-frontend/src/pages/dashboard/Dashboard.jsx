@@ -5,10 +5,13 @@ import ApplicationChart, {
 } from "../../components/dashboard/ApplicationChart";
 import { useNavigate } from "react-router-dom";
 import { FaPlus, FaBrain, FaBriefcase, FaCalendarAlt, FaRocket } from "react-icons/fa";
+import { useTheme } from "../../context/ThemeContext";
 
 const Dashboard = () => {
   const { applications } = useApplication();
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const user = (() => {
     try {
@@ -51,21 +54,24 @@ const Dashboard = () => {
       title: "Success Rate",
       value: `${successRate.toFixed(1)}%`,
       badge: "Conversion",
-      color: "text-emerald-400",
+      darkColor: "text-emerald-400",
+      lightColor: "text-emerald-600",
       path: "/applications?status=OFFER",
     },
     {
       title: "Interviews Scheduled",
       value: interviewsScheduled,
       badge: "In Progress",
-      color: "text-amber-400",
+      darkColor: "text-amber-400",
+      lightColor: "text-amber-600",
       path: "/applications?status=INTERVIEW&view=kanban",
     },
     {
       title: "Offers Received",
       value: offer,
       badge: "Secured",
-      color: "text-emerald-400",
+      darkColor: "text-emerald-400",
+      lightColor: "text-emerald-600",
       path: "/applications?status=OFFER",
     },
   ];
@@ -76,21 +82,31 @@ const Dashboard = () => {
     .slice(0, 3);
 
   return (
-    <div className="space-y-8 p-4 sm:p-6 max-w-7xl mx-auto font-sans text-slate-100 min-h-[85vh]">
+    <div className={`space-y-8 p-4 sm:p-6 max-w-7xl mx-auto font-sans min-h-[85vh] ${
+      isDark ? "text-slate-100" : "text-slate-900"
+    }`}>
       {/* Hero Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-800/90 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-96 h-96 bg-gradient-to-br from-blue-600/20 via-purple-600/10 to-transparent blur-3xl pointer-events-none rounded-full" />
+      <div className={`relative overflow-hidden rounded-3xl border p-6 sm:p-8 shadow-2xl transition-colors duration-200 ${
+        isDark
+          ? "border-slate-800/90 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 text-white"
+          : "border-blue-200 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-blue-500/20"
+      }`}>
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-96 h-96 bg-gradient-to-br from-blue-400/20 via-purple-400/10 to-transparent blur-3xl pointer-events-none rounded-full" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-950/60 px-3.5 py-1 text-xs font-semibold text-blue-400 backdrop-blur-md">
-              <FaRocket className="text-blue-400" />
+            <div className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-semibold backdrop-blur-md ${
+              isDark
+                ? "border-blue-500/30 bg-blue-950/60 text-blue-400"
+                : "border-white/30 bg-white/20 text-white"
+            }`}>
+              <FaRocket />
               Career Command Center Active
             </div>
             <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Welcome back, <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">{user?.name || "Job Seeker"}</span> 👋
+              Welcome back, <span className={isDark ? "bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent" : "text-white"}>{user?.name || "Job Seeker"}</span> 👋
             </h1>
-            <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
+            <p className={`text-sm max-w-xl leading-relaxed ${isDark ? "text-slate-300" : "text-blue-100"}`}>
               Track your recruitment pipeline, monitor upcoming interviews, and optimize your resume with Gemini AI.
             </p>
           </div>
@@ -98,16 +114,24 @@ const Dashboard = () => {
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => navigate("/applications/add")}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-5 py-3 text-xs font-extrabold text-white shadow-xl shadow-blue-600/25 transition transform active:scale-95"
+              className={`flex items-center gap-2 rounded-xl px-5 py-3 text-xs font-extrabold shadow-xl transition transform active:scale-95 ${
+                isDark
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-600/25"
+                  : "bg-white text-blue-700 hover:bg-slate-100 shadow-slate-900/20"
+              }`}
             >
               <FaPlus /> Add Application
             </button>
 
             <button
               onClick={() => navigate("/resume-match")}
-              className="flex items-center gap-2 rounded-xl border border-purple-800/80 bg-purple-950/80 hover:bg-purple-900 px-5 py-3 text-xs font-extrabold text-purple-200 transition shadow-xl shadow-purple-900/20"
+              className={`flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-extrabold transition shadow-xl ${
+                isDark
+                  ? "border-purple-800/80 bg-purple-950/80 hover:bg-purple-900 text-purple-200 shadow-purple-900/20"
+                  : "border-white/40 bg-white/20 hover:bg-white/30 text-white"
+              }`}
             >
-              <FaBrain className="text-purple-400" /> Run AI Resume Matcher
+              <FaBrain /> Run AI Resume Matcher
             </button>
           </div>
         </div>
@@ -149,14 +173,23 @@ const Dashboard = () => {
 
       {/* EMPTY STATE */}
       {total === 0 ? (
-        <div className="relative rounded-3xl border border-slate-800/90 bg-gradient-to-b from-slate-900/90 to-slate-950/90 p-12 text-center shadow-2xl space-y-5 overflow-hidden backdrop-blur-xl">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/10 blur-3xl pointer-events-none rounded-full" />
+        <div className={`relative rounded-3xl border p-12 text-center shadow-xl space-y-5 overflow-hidden transition-colors duration-200 ${
+          isDark
+            ? "border-slate-800/90 bg-gradient-to-b from-slate-900/90 to-slate-950/90 text-white"
+            : "border-slate-200 bg-white text-slate-900 shadow-slate-200/50"
+        }`}>
           <div className="relative z-10 space-y-4">
-            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600/20 to-indigo-600/20 border border-blue-500/30 text-blue-400 text-3xl shadow-lg shadow-blue-500/10">
+            <div className={`inline-flex h-16 w-16 items-center justify-center rounded-2xl text-3xl shadow-lg ${
+              isDark
+                ? "bg-blue-600/10 border border-blue-500/20 text-blue-400"
+                : "bg-blue-50 border border-blue-200 text-blue-600"
+            }`}>
               <FaBriefcase />
             </div>
-            <h3 className="text-2xl font-extrabold text-white">No Job Applications Tracked Yet</h3>
-            <p className="text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+            <h3 className={`text-2xl font-extrabold ${isDark ? "text-white" : "text-slate-900"}`}>
+              No Job Applications Tracked Yet
+            </h3>
+            <p className={`text-sm max-w-md mx-auto leading-relaxed ${isDark ? "text-slate-400" : "text-slate-600"}`}>
               Start building your recruitment pipeline by adding your target companies, salary expectations, and interview rounds.
             </p>
             <div className="pt-2">
@@ -179,17 +212,25 @@ const Dashboard = () => {
                   key={card.title}
                   type="button"
                   onClick={() => navigate(card.path)}
-                  className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 text-left transition hover:border-slate-700 hover:bg-slate-900 shadow-xl"
+                  className={`rounded-2xl border p-5 text-left transition shadow-xl ${
+                    isDark
+                      ? "border-slate-800 bg-slate-900/90 text-white hover:border-slate-700"
+                      : "border-slate-200 bg-white text-slate-900 hover:border-slate-300 shadow-slate-200/50"
+                  }`}
                 >
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    <span className={`text-xs font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                       {card.title}
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                      isDark
+                        ? "bg-slate-800 text-slate-300 border-slate-700"
+                        : "bg-slate-100 text-slate-700 border-slate-200"
+                    }`}>
                       {card.badge}
                     </span>
                   </div>
-                  <h2 className={`text-3xl font-black ${card.color}`}>
+                  <h2 className={`text-3xl font-black ${isDark ? card.darkColor : card.lightColor}`}>
                     {card.value}
                   </h2>
                 </button>
@@ -197,18 +238,20 @@ const Dashboard = () => {
             </div>
 
             {/* Upcoming Follow-ups widget */}
-            <div className="md:col-span-4 rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl space-y-3">
-              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <FaCalendarAlt className="text-blue-400" /> Upcoming Follow-ups
+            <div className={`md:col-span-4 rounded-2xl border p-5 shadow-xl space-y-3 ${
+              isDark ? "border-slate-800 bg-slate-900/90 text-white" : "border-slate-200 bg-white text-slate-900 shadow-slate-200/50"
+            }`}>
+              <div className={`flex justify-between items-center border-b pb-3 ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+                <span className={`text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                  <FaCalendarAlt className="text-blue-500" /> Upcoming Follow-ups
                 </span>
-                <span className="text-[10px] font-bold text-slate-400">
+                <span className={`text-[10px] font-bold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   {upcomingFollowUpsList.length} Scheduled
                 </span>
               </div>
 
               {upcomingFollowUpsList.length === 0 ? (
-                <p className="text-xs text-slate-500 py-4 text-center">
+                <p className={`text-xs py-4 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                   No upcoming follow-up dates set.
                 </p>
               ) : (
@@ -217,13 +260,17 @@ const Dashboard = () => {
                     <button
                       key={app.id}
                       onClick={() => navigate(`/applications/${app.id}`)}
-                      className="w-full flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/70 p-3 hover:border-slate-700 transition text-left"
+                      className={`w-full flex items-center justify-between rounded-xl border p-3 transition text-left ${
+                        isDark
+                          ? "border-slate-800/80 bg-slate-950/70 hover:border-slate-700"
+                          : "border-slate-200 bg-slate-50 hover:bg-slate-100"
+                      }`}
                     >
                       <div>
-                        <p className="text-xs font-bold text-white">{app.companyName}</p>
-                        <p className="text-[11px] text-slate-400">{app.jobRole}</p>
+                        <p className={`text-xs font-bold ${isDark ? "text-white" : "text-slate-900"}`}>{app.companyName}</p>
+                        <p className={`text-[11px] ${isDark ? "text-slate-400" : "text-slate-500"}`}>{app.jobRole}</p>
                       </div>
-                      <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">
+                      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200">
                         {app.followUpDate}
                       </span>
                     </button>
@@ -235,13 +282,17 @@ const Dashboard = () => {
 
           {/* Charts Section */}
           <div className="grid lg:grid-cols-2 gap-6">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl">
-              <h3 className="text-base font-bold text-white mb-4">Application Distribution</h3>
+            <div className={`rounded-2xl border p-6 shadow-xl ${
+              isDark ? "border-slate-800 bg-slate-900/90 text-white" : "border-slate-200 bg-white text-slate-900 shadow-slate-200/50"
+            }`}>
+              <h3 className={`text-base font-bold mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>Application Distribution</h3>
               <ApplicationChart data={chartData} />
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl">
-              <h3 className="text-base font-bold text-white mb-4">Monthly Application Activity</h3>
+            <div className={`rounded-2xl border p-6 shadow-xl ${
+              isDark ? "border-slate-800 bg-slate-900/90 text-white" : "border-slate-200 bg-white text-slate-900 shadow-slate-200/50"
+            }`}>
+              <h3 className={`text-base font-bold mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>Monthly Application Activity</h3>
               <MonthlyApplicationChart data={monthlyData} />
             </div>
           </div>
