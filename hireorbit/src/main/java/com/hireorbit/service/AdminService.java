@@ -15,6 +15,11 @@ import com.hireorbit.repository.JobApplicationRepository;
 import com.hireorbit.repository.ResumeAnalysisRepository;
 import com.hireorbit.repository.UserRepository;
 
+import com.hireorbit.entity.InterviewRound;
+import com.hireorbit.entity.JobApplication;
+import com.hireorbit.entity.ResumeAnalysis;
+import com.hireorbit.repository.InterviewRoundRepository;
+
 @Service
 public class AdminService {
 
@@ -23,6 +28,9 @@ public class AdminService {
 
 	@Autowired
 	private JobApplicationRepository jobApplicationRepository;
+
+	@Autowired
+	private InterviewRoundRepository interviewRoundRepository;
 
 	@Autowired
 	private ResumeAnalysisRepository resumeAnalysisRepository;
@@ -73,10 +81,34 @@ public class AdminService {
 	public String deleteUser(Long userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
 		if ("admin@hireorbit.com".equalsIgnoreCase(user.getEmail())) {
 			throw new IllegalArgumentException("Cannot delete primary admin account");
 		}
+
+		// 1. Delete all interview rounds for user's job applications
+		List<JobApplication> apps = jobApplicationRepository.findByUserId(userId);
+		for (JobApplication app : apps) {
+			List<InterviewRound> rounds = interviewRoundRepository.findByJobApplicationId(app.getId());
+			if (!rounds.isEmpty()) {
+				interviewRoundRepository.deleteAllInBatch(rounds);
+			}
+		}
+
+		// 2. Delete all job applications for user
+		if (!apps.isEmpty()) {
+			jobApplicationRepository.deleteAllInBatch(apps);
+		}
+
+		// 3. Delete all resume analyses for user
+		List<ResumeAnalysis> analyses = resumeAnalysisRepository.findTop10ByUserIdOrderByCreatedAtDesc(userId);
+		if (!analyses.isEmpty()) {
+			resumeAnalysisRepository.deleteAllInBatch(analyses);
+		}
+
+		// 4. Delete user
 		userRepository.delete(user);
+
 		return "User deleted successfully";
 	}
 }
