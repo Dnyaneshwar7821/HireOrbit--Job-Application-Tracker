@@ -141,12 +141,12 @@ const Home = () => {
             <div className="mb-6 flex items-center justify-between border-b border-slate-800 pb-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Live Application Pipeline
+                  Interactive Showcase
                 </p>
-                <h2 className="text-xl font-bold text-white mt-0.5">Active Trackers</h2>
+                <h2 className="text-xl font-bold text-white mt-0.5">Dashboard Preview</h2>
               </div>
-              <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 text-xs font-bold text-emerald-400">
-                ● Live Updates
+              <span className="rounded-full bg-blue-500/10 border border-blue-500/30 px-3 py-1 text-xs font-bold text-blue-400">
+                Product Showcase
               </span>
             </div>
 
