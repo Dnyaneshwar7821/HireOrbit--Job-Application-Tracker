@@ -24,6 +24,8 @@ public class SecurityConfig {
 		}).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
 						// Public endpoints
+						.requestMatchers(new AntPathRequestMatcher("/", HttpMethod.GET.name())).permitAll()
+						.requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
 						.requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
 						.requestMatchers(new AntPathRequestMatcher("/api/jobs", HttpMethod.GET.name())).permitAll()
 						.requestMatchers(new AntPathRequestMatcher("/api/jobs/{id}", HttpMethod.GET.name())).permitAll()
