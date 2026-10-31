@@ -1,0 +1,7 @@
+.git
+.gitignore
+hireorbit-frontend/
+target/
+.metadata/
+*.md
+
