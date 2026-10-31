@@ -94,7 +94,7 @@ Recommended production setup:
 Set this in the Vercel project settings:
 
 ```properties
-VITE_API_URL=https://hireorbit-job-application-tracker-1.onrender.com
+VITE_API_URL=https://hireorbit-job-application-tracker.onrender.com
 ```
 
 Then redeploy the Vercel frontend.
