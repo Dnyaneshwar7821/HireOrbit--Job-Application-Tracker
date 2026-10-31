@@ -1,7 +1,7 @@
 package com.hireorbit.config;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -47,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
 					if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
 						UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null,
-								java.util.List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(authority)));
+								List.of(new SimpleGrantedAuthority(authority)));
 
 						auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

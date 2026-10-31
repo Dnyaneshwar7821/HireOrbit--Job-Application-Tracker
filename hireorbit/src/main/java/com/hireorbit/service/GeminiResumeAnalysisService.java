@@ -25,7 +25,7 @@ public class GeminiResumeAnalysisService {
 	private final String apiKey;
 	private final String model;
 	private final int timeoutSeconds;
-	private final HttpClient httpClient;
+	private volatile HttpClient httpClient;
 	private final ObjectMapper objectMapper;
 
 	public GeminiResumeAnalysisService(@Value("${app.gemini.api-key:}") String apiKey,
@@ -35,7 +35,17 @@ public class GeminiResumeAnalysisService {
 		this.model = model;
 		this.timeoutSeconds = timeoutSeconds;
 		this.objectMapper = objectMapper;
-		this.httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+	}
+
+	private HttpClient getHttpClient() {
+		if (this.httpClient == null) {
+			synchronized (this) {
+				if (this.httpClient == null) {
+					this.httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+				}
+			}
+		}
+		return this.httpClient;
 	}
 
 	public Optional<ResumeMatchResponse> analyze(String resume, String jobDescription) {
@@ -61,7 +71,7 @@ public class GeminiResumeAnalysisService {
 					.header("Content-Type", "application/json")
 					.POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(requestBody))).build();
 
-			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+			HttpResponse<String> response = getHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
 			if (response.statusCode() < 200 || response.statusCode() >= 300) {
 				return Optional.empty();

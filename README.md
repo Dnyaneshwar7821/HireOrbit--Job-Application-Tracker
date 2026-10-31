@@ -192,6 +192,17 @@ Interviews:
 - `GET /interviews/get-interviews/{applicationId}`
 - `PUT /interviews/update-interview/{id}`
 
+Job Postings & ATS:
+- `GET /api/jobs`
+- `GET /api/jobs/{id}`
+- `POST /api/jobs/{id}/apply`
+- `POST /api/jobs`
+- `PUT /api/jobs/{id}`
+- `DELETE /api/jobs/{id}`
+- `GET /api/jobs/{id}/applicants`
+- `PUT /api/jobs/applications/{id}/status`
+- `POST /api/jobs/{id}/rank-applicants`
+
 Dashboard:
 - `GET /dashboard/stats`
 

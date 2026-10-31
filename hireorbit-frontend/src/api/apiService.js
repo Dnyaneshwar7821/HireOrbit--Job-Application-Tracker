@@ -33,8 +33,11 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.clear();
-      window.location.href = "/login";
+      localStorage.removeItem("token");
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes("/login") && !currentPath.includes("/register")) {
+        window.location.href = "/login";
+      }
     }
 
     if (error.code === "ECONNABORTED") {

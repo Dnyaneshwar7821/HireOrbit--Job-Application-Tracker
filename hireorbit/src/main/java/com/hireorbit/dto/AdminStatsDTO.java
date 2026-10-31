@@ -21,4 +21,6 @@ public class AdminStatsDTO {
 	private long totalResumeAnalyses;
 	private double successRate;
 	private Map<String, Long> statusBreakdown;
+	private long totalJobsPosted;
+	private long activeJobs;
 }

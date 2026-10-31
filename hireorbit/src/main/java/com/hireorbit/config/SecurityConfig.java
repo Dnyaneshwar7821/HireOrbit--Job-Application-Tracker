@@ -3,6 +3,7 @@ package com.hireorbit.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,11 +23,21 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable()).cors(cors -> {
 		}).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
-						// ✅ Public endpoints
+						// Public endpoints
 						.requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
-						// 👑 Admin endpoints
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs", HttpMethod.GET.name())).permitAll()
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs/{id}", HttpMethod.GET.name())).permitAll()
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs/*/apply", HttpMethod.POST.name())).authenticated()
+						// Admin endpoints
 						.requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
-						// 🔒 All other endpoints require authentication
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs/admin/**")).hasRole("ADMIN")
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs/*/applicants")).hasRole("ADMIN")
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs/*/rank-applicants")).hasRole("ADMIN")
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs/applications/**")).hasRole("ADMIN")
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs", HttpMethod.POST.name())).hasRole("ADMIN")
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs/**", HttpMethod.PUT.name())).hasRole("ADMIN")
+						.requestMatchers(new AntPathRequestMatcher("/api/jobs/**", HttpMethod.DELETE.name())).hasRole("ADMIN")
+						// All other endpoints require authentication
 						.anyRequest().authenticated())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

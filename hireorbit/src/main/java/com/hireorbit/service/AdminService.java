@@ -9,16 +9,15 @@ import org.springframework.stereotype.Service;
 
 import com.hireorbit.dto.AdminStatsDTO;
 import com.hireorbit.dto.UserSummaryDTO;
-import com.hireorbit.entity.User;
-import com.hireorbit.exception.ResourceNotFoundException;
-import com.hireorbit.repository.JobApplicationRepository;
-import com.hireorbit.repository.ResumeAnalysisRepository;
-import com.hireorbit.repository.UserRepository;
-
 import com.hireorbit.entity.InterviewRound;
 import com.hireorbit.entity.JobApplication;
-import com.hireorbit.entity.ResumeAnalysis;
+import com.hireorbit.entity.User;
+import com.hireorbit.exception.ResourceNotFoundException;
 import com.hireorbit.repository.InterviewRoundRepository;
+import com.hireorbit.repository.JobApplicationRepository;
+import com.hireorbit.repository.JobPostingRepository;
+import com.hireorbit.repository.ResumeAnalysisRepository;
+import com.hireorbit.repository.UserRepository;
 
 @Service
 public class AdminService {
@@ -35,6 +34,9 @@ public class AdminService {
 	@Autowired
 	private ResumeAnalysisRepository resumeAnalysisRepository;
 
+	@Autowired
+	private JobPostingRepository jobPostingRepository;
+
 	public AdminStatsDTO getPlatformStats() {
 		long totalUsers = userRepository.count();
 		long totalApplications = jobApplicationRepository.count();
@@ -48,6 +50,14 @@ public class AdminService {
 		} catch (Exception ignored) {
 		}
 
+		long totalJobsPosted = 0;
+		long activeJobs = 0;
+		try {
+			totalJobsPosted = jobPostingRepository.count();
+			activeJobs = jobPostingRepository.countByStatus("ACTIVE");
+		} catch (Exception ignored) {
+		}
+
 		double successRate = totalApplications == 0 ? 0 : (totalOffers * 100.0) / totalApplications;
 
 		Map<String, Long> breakdown = new HashMap<>();
@@ -57,7 +67,7 @@ public class AdminService {
 		breakdown.put("REJECTED", totalRejected);
 
 		return new AdminStatsDTO(totalUsers, totalApplications, totalInterviews, totalOffers, totalRejected,
-				totalResumeAnalyses, successRate, breakdown);
+				totalResumeAnalyses, successRate, breakdown, totalJobsPosted, activeJobs);
 	}
 
 	public List<UserSummaryDTO> getAllUsers() {
@@ -100,15 +110,14 @@ public class AdminService {
 			jobApplicationRepository.deleteAllInBatch(apps);
 		}
 
-		// 3. Delete all resume analyses for user
-		List<ResumeAnalysis> analyses = resumeAnalysisRepository.findTop10ByUserIdOrderByCreatedAtDesc(userId);
-		if (!analyses.isEmpty()) {
-			resumeAnalysisRepository.deleteAllInBatch(analyses);
+		// 3. Delete resume analyses for user
+		try {
+			resumeAnalysisRepository.deleteByUserId(userId);
+		} catch (Exception ignored) {
 		}
 
 		// 4. Delete user
 		userRepository.delete(user);
-
 		return "User deleted successfully";
 	}
 }

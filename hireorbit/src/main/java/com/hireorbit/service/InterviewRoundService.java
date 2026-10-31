@@ -21,24 +21,26 @@ public class InterviewRoundService {
 	@Autowired
 	private JobApplicationRepository jobRepo;
 
-	// 🔥 ADD ROUND
+	// ADD ROUND
 	public InterviewRound addRound(InterviewRound round, Long applicationId, Long userId) {
 
 		JobApplication application = jobRepo.findByIdAndUserId(applicationId, userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
 		round.setJobApplication(application);
-		round.setDate(LocalDate.now());
+		if (round.getDate() == null) {
+			round.setDate(LocalDate.now());
+		}
 
 		InterviewRound saved = interviewRepo.save(round);
 
-		// 🔥 UPDATE APPLICATION STATUS
+		// UPDATE APPLICATION STATUS
 		recalculateApplicationStatus(applicationId);
 
 		return saved;
 	}
 
-	// 🔥 GET ROUNDS
+	// GET ROUNDS
 	public List<InterviewRound> getRounds(Long applicationId, Long userId) {
 		jobRepo.findByIdAndUserId(applicationId, userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Application not found"));
@@ -46,26 +48,32 @@ public class InterviewRoundService {
 		return interviewRepo.findByJobApplicationId(applicationId);
 	}
 
-	// 🔥 UPDATE ROUND
+	// UPDATE ROUND
 	public InterviewRound updateRoundById(Long id, InterviewRound updatedRound, Long userId) {
 
 		InterviewRound existing = interviewRepo.findByIdAndJobApplication_User_Id(id, userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Interview not found"));
 
-		existing.setRoundName(updatedRound.getRoundName());
-		existing.setResult(updatedRound.getResult());
-		existing.setDate(LocalDate.now());
+		if (updatedRound.getRoundName() != null && !updatedRound.getRoundName().isBlank()) {
+			existing.setRoundName(updatedRound.getRoundName());
+		}
+		if (updatedRound.getResult() != null && !updatedRound.getResult().isBlank()) {
+			existing.setResult(updatedRound.getResult());
+		}
+		if (updatedRound.getDate() != null) {
+			existing.setDate(updatedRound.getDate());
+		}
 
 		InterviewRound saved = interviewRepo.save(existing);
 
-		// 🔥 UPDATE APPLICATION STATUS
+		// UPDATE APPLICATION STATUS
 		Long applicationId = existing.getJobApplication().getId();
 		recalculateApplicationStatus(applicationId);
 
 		return saved;
 	}
 
-	// 🔥 CORE LOGIC (IMPORTANT)
+	// CORE LOGIC
 	private void recalculateApplicationStatus(Long applicationId) {
 
 		List<InterviewRound> rounds = interviewRepo.findByJobApplicationId(applicationId);

@@ -50,6 +50,17 @@ const ApplicationCard = ({ app, onDelete }) => {
                 <span className={`h-1.5 w-1.5 rounded-full ${statusDotColors[app.status] || "bg-slate-400"}`} />
                 {app.status}
               </span>
+
+              {app.applicationType === "INTERNAL" && (
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  🎯 Verified Job
+                </span>
+              )}
+              {app.aiMatchScore > 0 && (
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  🧠 {app.aiMatchScore}% ATS
+                </span>
+              )}
             </div>
 
             <p className="font-bold text-blue-500 text-sm flex items-center gap-2">

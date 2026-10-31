@@ -10,7 +10,6 @@ import {
   FaArrowRight,
   FaCheckCircle,
   FaStar,
-  FaRocket,
   FaDatabase,
   FaLock,
   FaRobot,
@@ -70,14 +69,6 @@ const Home = () => {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState("user");
   const [activeTab, setActiveTab] = useState("pipeline");
-
-  const handlePortalNavigate = () => {
-    if (selectedRole === "admin") {
-      navigate("/admin/login");
-    } else {
-      navigate("/login");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white overflow-x-hidden font-sans">

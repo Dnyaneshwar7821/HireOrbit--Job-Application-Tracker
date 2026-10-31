@@ -24,6 +24,28 @@ const AdminDashboard = () => {
     setTimeout(() => setToast(null), 4000);
   };
 
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      try {
+        const [statsRes, usersRes] = await Promise.all([
+          adminService.getStats(),
+          adminService.getUsers(),
+        ]);
+        if (isMounted) {
+          setStats(statsRes.data);
+          setUsers(usersRes.data);
+        }
+      } catch {
+        // Keep quiet or show subtle toast on error
+      }
+    };
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const loadAdminData = async () => {
     try {
       const [statsRes, usersRes] = await Promise.all([
@@ -36,10 +58,6 @@ const AdminDashboard = () => {
       // Keep quiet or show subtle toast on error
     }
   };
-
-  useEffect(() => {
-    loadAdminData();
-  }, []);
 
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
@@ -139,7 +157,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
           <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
             Total Job Seekers
@@ -148,6 +166,18 @@ const AdminDashboard = () => {
             {stats.totalUsers}
           </p>
           <p className="text-xs text-indigo-400 mt-1">Registered Accounts</p>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+          <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
+            Active Job Openings
+          </p>
+          <p className="text-3xl font-extrabold text-cyan-400 mt-2">
+            {stats.activeJobs || 0}
+          </p>
+          <p className="text-xs text-slate-400 mt-1">
+            Total Posted: {stats.totalJobsPosted || 0}
+          </p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
@@ -172,7 +202,7 @@ const AdminDashboard = () => {
           </p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg col-span-2 md:col-span-1">
           <p className="text-xs uppercase font-semibold text-slate-400 tracking-wider">
             AI Resume Analyses
           </p>

@@ -11,11 +11,13 @@ import {
   FaShieldAlt,
   FaSun,
   FaMoon,
+  FaLayerGroup,
 } from "react-icons/fa";
 
 const navItems = [
+  { to: "/jobs", label: "Job Board", icon: FaBriefcase },
   { to: "/dashboard", label: "Dashboard", icon: FaChartPie },
-  { to: "/applications", label: "Applications", icon: FaBriefcase },
+  { to: "/applications", label: "Tracker", icon: FaLayerGroup },
   { to: "/resume-match", label: "Resume Analyzer", icon: FaBrain },
   { to: "/profile", label: "Profile", icon: FaUser },
 ];
@@ -28,7 +30,8 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     clearApplications();
     navigate("/login");
   };
@@ -60,7 +63,7 @@ const Navbar = () => {
               </span>
             </h1>
             <p className={`text-[11px] ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-              Career Command Center
+              AI Career & Hiring Platform
             </p>
           </div>
         </Link>
@@ -130,7 +133,7 @@ const Navbar = () => {
                 }`}
               >
                 <FaShieldAlt className="text-xs" />
-                <span className="hidden sm:inline">Admin Panel</span>
+                <span className="hidden sm:inline">Admin ATS</span>
               </Link>
             )}
 

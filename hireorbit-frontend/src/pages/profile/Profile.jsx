@@ -6,7 +6,6 @@ import { useTheme } from "../../context/ThemeContext";
 import { useApplication } from "../../context/applicationContextValue";
 import {
   FaUserCheck,
-  FaShieldAlt,
   FaBriefcase,
   FaCalendarCheck,
   FaBrain,
@@ -30,7 +29,7 @@ const Profile = () => {
   const [targetRole, setTargetRole] = useState("Software Engineer");
   const [targetSalary, setTargetSalary] = useState("$120,000 - $150,000");
   const [locationPref, setLocationPref] = useState("Remote / Hybrid");
-  const [skills, setSkills] = useState(["React", "TypeScript", "Node.js", "Java", "Spring Boot", "SQL"]);
+  const [skills] = useState(["React", "TypeScript", "Node.js", "Java", "Spring Boot", "SQL"]);
 
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();

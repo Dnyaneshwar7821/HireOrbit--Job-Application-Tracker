@@ -9,8 +9,6 @@ import {
   FaPlus,
   FaDownload,
   FaSearch,
-  FaFilter,
-  FaSortAmountDown,
   FaThList,
   FaColumns,
   FaStream,
@@ -178,7 +176,14 @@ const AllApplications = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => navigate("/jobs")}
+            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-blue-500/20 inline-flex items-center gap-1.5 transition"
+          >
+            <FaBriefcase className="text-xs" /> Explore Job Board
+          </button>
+
           <button onClick={exportToCSV} className={ui.buttonSecondary}>
             <FaDownload className="mr-1.5 text-xs" /> Export CSV
           </button>
@@ -187,7 +192,7 @@ const AllApplications = () => {
             onClick={() => navigate("/applications/add")}
             className={ui.buttonPrimary}
           >
-            <FaPlus className="mr-1.5 text-xs" /> Add Application
+            <FaPlus className="mr-1.5 text-xs" /> Add Tracker Entry
           </button>
         </div>
       </div>

@@ -6,6 +6,7 @@ const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 
+const JobBoard = lazy(() => import("./pages/jobs/JobBoard"));
 const AddApplication = lazy(() => import("./pages/applications/AddApplication"));
 const AllApplications = lazy(() =>
   import("./pages/applications/AllApplications"),
@@ -25,6 +26,10 @@ const ResumeMatch = lazy(() => import("./pages/ResumeMatch"));
 
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminJobs = lazy(() => import("./pages/admin/AdminJobs"));
+const AdminJobApplicants = lazy(() =>
+  import("./pages/admin/AdminJobApplicants"),
+);
 
 import Layout from "./components/common/Layout";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -37,17 +42,22 @@ function App() {
         {/* Home */}
         <Route path="/" element={<Home />} />
 
-        {/* Public */}
+        {/* Public Auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+
+        {/* Public & Authenticated Job Board */}
+        <Route element={<Layout />}>
+          <Route path="/jobs" element={<JobBoard />} />
+        </Route>
 
         {/* Protected User Panel */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
 
-            {/* Applications */}
+            {/* Applications Tracker */}
             <Route path="/applications" element={<AllApplications />} />
             <Route path="/applications/add" element={<AddApplication />} />
             <Route
@@ -78,6 +88,11 @@ function App() {
         <Route element={<ProtectedRoute adminOnly={true} />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/jobs" element={<AdminJobs />} />
+            <Route
+              path="/admin/jobs/:jobId/applicants"
+              element={<AdminJobApplicants />}
+            />
           </Route>
         </Route>
       </Routes>
